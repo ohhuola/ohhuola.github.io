@@ -29,12 +29,39 @@
 	</header>
 
 	<main>
-		<article>
-	<h1>categories</h1>
+		<h1>categories</h1>
 
+<ul class="archive">
 	
+		
+		<li class="archive__year archive__expendable">
+			<span>Web Security</span>
+			<ul>
+			
+				
+			
+				
+					
+					
+						<li class="archive__entry"><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></li>
+					
+
+				
+			
+			</ul>
+		</li>
 	
-</article>
+</ul>
+
+<script>
+	const expandables = document.querySelectorAll('.archive__expendable')
+	for(let i = 0; i < expandables.length; i++) {
+		expandables[i].addEventListener('click', (e) => {
+			e.stopPropagation()
+			expandables[i].classList.toggle('archive__expendable_collapsed')
+		})
+	}
+</script>
 
 	</main>
 

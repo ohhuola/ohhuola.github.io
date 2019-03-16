@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[CBC翻转字节攻击]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql4%2F</url>
+    <content type="text"><![CDATA[知识点:AES的CBC模式加密加密过程: IV:用于随机化加密的字符串 ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块 ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块 1.png 解密过程: plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块 plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1 2.png CBC攻击攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文 3.png 实际应用:Bugku-login4login4]]></content>
+      <categories>
+        <category>Web Security</category>
+      </categories>
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Hello World]]></title>
     <url>%2F2019%2F03%2F16%2Fhello-world%2F</url>
     <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
