@@ -35,7 +35,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/04/08/bug-compatibility/">bug-compatibility</a></h1>
+		<h1><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-04-08</span><br>
@@ -54,7 +54,7 @@
 	
 
 	
-		<h2 id="两个常见的python2与python3的兼容问题"><a href="#两个常见的python2与python3的兼容问题" class="headerlink" title="两个常见的python2与python3的兼容问题"></a>两个常见的python2与python3的兼容问题</h2><ol>
+		<ol>
 <li><p>字符编码类型</p>
 <ul>
 <li>python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。</li>
@@ -63,9 +63,11 @@
 </li>
 </ol>
 <h4 id="兼容技巧"><a href="#兼容技巧" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
-<li>字符串赋值之前均使用前缀u。</li>
-<li><p>引入unicode_literals</p>
-</li>
+<li>字符串赋值之前均使用前缀u</li>
+<li>引入unicode_literals</li>
+</ol>
+<hr>
+<ol start="2">
 <li><p>导入模块的路径搜索方式</p>
 <ul>
 <li>python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。</li>
