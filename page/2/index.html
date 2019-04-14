@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></h1>
+		<h1><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-04-08</span><br>
@@ -48,7 +48,7 @@
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/flask/">flask</a> <a class="article__tag-link" href="/tags/python/">python</a>
+			  	<a class="article__tag-link" href="/tags/python/">python</a>
 			</span>
 		
 	</div>
@@ -56,12 +56,35 @@
 	
 
 	
-		<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
-<blockquote>
-<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
-</blockquote>
-<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&apos;utf-8&apos;) #修改默认编码方式</span><br></pre></td></tr></table></figure>
+		<ol>
+<li><p>字符编码类型</p>
+<ul>
+<li>python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。</li>
+<li>python3统一使用unicode字符,节省了开发者时间。</li>
+</ul>
+</li>
+</ol>
+<h4 id="兼容技巧"><a href="#兼容技巧" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>字符串赋值之前均使用前缀u</li>
+<li>引入unicode_literals</li>
+</ol>
+<hr>
+<ol start="2">
+<li><p>导入模块的路径搜索方式</p>
+<ul>
+<li>python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。</li>
+<li>python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。</li>
+</ul>
+</li>
+</ol>
+<h4 id="兼容技巧-1"><a href="#兼容技巧-1" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>统一使用绝对路径进行自定义模块导入</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">path=os.path.abspath()</span><br><span class="line">sys.path.append(path)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。</li>
+</ol>
+
 	
 
 	

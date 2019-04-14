@@ -37,18 +37,18 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></h1>
+		<h1><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br>
+		<span class="article__date">2019-04-08</span><br>
 		
 			<span class="article__category">
-				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
+				<a class="article-category-link" href="/categories/Bugs/">Bugs</a>
 			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
+			  	<a class="article__tag-link" href="/tags/flask/">flask</a> <a class="article__tag-link" href="/tags/python/">python</a>
 			</span>
 		
 	</div>
@@ -56,20 +56,12 @@
 	
 
 	
-		<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote>
-<p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
+		<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
+<blockquote>
+<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
 </blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
-<hr>
-<h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote>
-<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
-<hr>
-<h4 id="CBC攻击"><a href="#CBC攻击" class="headerlink" title="CBC攻击"></a>CBC攻击</h4><p><strong>攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.<br>主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文</strong></p>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dd24bba15.jpg" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p>
-<h4 id="实际应用-Bugku-login4"><a href="#实际应用-Bugku-login4" class="headerlink" title="实际应用:Bugku-login4"></a>实际应用:Bugku-login4</h4><p><a href="http://123.206.31.85:49168/" target="_blank" rel="noopener">login4</a></p>
-
+<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&apos;utf-8&apos;) #修改默认编码方式</span><br></pre></td></tr></table></figure>
 	
 
 	
@@ -80,8 +72,8 @@
 
 
 
+	<span class="different-posts">📖 <a href="/page/4">more posts</a> 📖</span>
 
-	<span class="different-posts">📕 end of posts 📕</span>
 
 
 	</main>

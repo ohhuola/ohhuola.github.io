@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[哲学家就餐问题详解]]></title>
+    <url>%2F2019%2F04%2F14%2Fdeadlock-problem%2F</url>
+    <content type="text"><![CDATA[问题：有五个哲学家，他们的生活方式是交替地进行思考和进餐。他们共用一张圆桌，分别坐在五张椅子上。在圆桌上有五个碗和五支叉子，平时一个哲学家进行思考，饥饿时便试图取用其左、右最靠近他的叉子，只有在他拿到两支叉子时才能进餐。进餐完毕，放下叉子又继续思考。 思考题目中明确不允许死锁的发生，所以排除无为而治的方法（鸵鸟算法）与死锁检测。 静态方法（死锁预防）互斥： 需要六把叉子或者是吃饭的时候共享叉子，与题意不符。 保持占有： 一次性拿两把叉子。 抢占： 不符合哲学家的身份。 设定资源访问顺序： 假设第一个哲学家年龄最大，那么第二个和第五个哲学家就要让他先吃。 动态方法（死锁避免）采用银行家算法：哲学家在每次拿动叉子的时候，先进行判断是否会出现死锁，如果可能出现，哲学家就不拿叉子。 解题伪代码方法012345678910111213141516semophore fork[5]=&#123;1&#125;;int i;void philosopher(int i)&#123; while(1)&#123; think(); wait(fork[i]); wait(fork[(i+1) mod 5]) eat(); signal(fork[i]); signal(fork[(i+1) mod 5]) &#125;&#125; int main()&#123; parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4)) &#125; 该方法可以保证不会有两位相邻的哲学家同时进餐。但是如果五位哲学家同时拿走了右边的叉子，他们每一个人都将会因为没有筷子而无期限的等待，造成思锁问题。 方法1思路：至多只允许四位哲学家就餐，由鸽笼原理可以得到至少有一位哲学家能够就餐，所以不会发生死锁。这时，需要引入新的信号量。 12345678910111213141516171819semophore fork[5]=&#123;1&#125;;semophore room=4;int i;void philosopher(int i)&#123; while(1)&#123; think(); wait(room); wait(fork[i]); wait(fork[(i+1) mod 5]) eat(); signal(fork[i]); signal(fork[(i+1) mod 5]) signal(room) &#125;&#125; int main()&#123; parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4)) &#125; 方法2思路：仅当哲学家左右的筷子同时拿起时才允许进餐（一次性请求全部的资源且不允许抢占）。这时，需要引入一个信号量mutex来对取左边叉子和右边叉子时进行互斥保护。 12345678910111213141516171819semaphore mutex=1;semophore fork[5]=&#123;1&#125;;int i;void philosopher(int i)&#123; while(1)&#123; think(); wait(mutex); wait(fork[i]); wait(fork[(i+1) mod 5]) signal(mutex); eat(); signal(fork[i]); signal(fork[(i+1) mod 5]) &#125;&#125; int main()&#123; parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4)) &#125; 方法3思路：设置资源访问顺序，引入两个信号量。 12345678910111213141516171819202122232425262728semophore fork[5]=&#123;1&#125;;semaphore s1=0,s2=0;int i;void philosopher(int i)&#123; while(1)&#123; think(); if((i mod 5)==1)&#123; wait(s1); &#125; if((i mod 5)==4)&#123; wait(s2); &#125; wait(fork[i]); wait(fork[(i+1) mod 5]) eat(); signal(fork[i]); signal(fork[(i+1) mod 5]) if((i mod 5)==0)&#123; signal(s1); signal(s2); &#125; &#125;&#125; int main()&#123; parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4)) &#125; 方法4（银行家算法）]]></content>
+      <categories>
+        <category>OS</category>
+      </categories>
+      <tags>
+        <tag>Deadlock</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[两个常见的python2与python3的兼容问题]]></title>
     <url>%2F2019%2F04%2F08%2Fbug-compatibility%2F</url>
     <content type="text"><![CDATA[字符编码类型 python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。 python3统一使用unicode字符,节省了开发者时间。 兼容技巧 字符串赋值之前均使用前缀u 引入unicode_literals 导入模块的路径搜索方式 python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。 python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。 兼容技巧 统一使用绝对路径进行自定义模块导入 12345import osimport syspath=os.path.abspath()sys.path.append(path) 如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。]]></content>
