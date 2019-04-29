@@ -29,64 +29,52 @@
 	</header>
 
 	<main>
-		<h1>Archive</h1>
-
-
-
-
-
-<ul class="archive">
-	
-	
-		<li class="archive__year archive__expendable ">
-			<span>2019</span>
-			<ul>
-				
-					<li class="archive__month archive__expendable">
-						<span>April</span>
-						<ul>
-							
-								<li class="archive__entry"><a href="/2019/04/29/Application Layer/">自顶向下计算机网络知识笔记(二)：Application Layer</a></li>
-							
-								<li class="archive__entry"><a href="/2019/04/29/Internet/">自顶向下计算机网络知识笔记(一)：Introduction</a></li>
-							
-								<li class="archive__entry"><a href="/2019/04/29/Transport layer/"></a></li>
-							
-								<li class="archive__entry"><a href="/2019/04/14/deadlock-problem/">哲学家就餐问题详解</a></li>
-							
-								<li class="archive__entry"><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></li>
-							
-								<li class="archive__entry"><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></li>
-							
-						</ul>
-					</li>
-
-				
-					<li class="archive__month archive__expendable">
-						<span>March</span>
-						<ul>
-							
-								<li class="archive__entry"><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></li>
-							
-						</ul>
-					</li>
-
-				
-			</ul>
-		</li>
 		
-	
-</ul>
+	<span class="different-posts different-posts_earlier">📖 <a href="/page/5">earlier posts</a> 📖</span>
 
-<script>
-	const expandables = document.querySelectorAll('.archive__expendable')
-	for(let i = 0; i < expandables.length; i++) {
-		expandables[i].addEventListener('click', (e) => {
-			e.stopPropagation()
-			expandables[i].classList.toggle('archive__expendable_collapsed')
-		})
-	}
-</script>
+
+
+
+	<article>
+	
+		<h1><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></h1>
+	
+	<div class="article__infos">
+		<span class="article__date">2019-04-08</span><br>
+		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/Bugs/">Bugs</a>
+			</span><br>
+		
+		
+			<span class="article__tags">
+			  	<a class="article__tag-link" href="/tags/flask/">flask</a> <a class="article__tag-link" href="/tags/python/">python</a>
+			</span>
+		
+	</div>
+
+	
+
+	
+		<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
+<blockquote>
+<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
+</blockquote>
+<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&apos;utf-8&apos;) #修改默认编码方式</span><br></pre></td></tr></table></figure>
+	
+
+	
+
+</article>
+
+
+
+
+
+	<span class="different-posts">📖 <a href="/page/7">more posts</a> 📖</span>
+
+
 
 	</main>
 
