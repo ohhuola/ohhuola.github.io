@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>Security Learning</title>
+	<title>自顶向下计算机网络知识笔记(三) | Security Learning</title>
 	<link rel="stylesheet" href="/css/style.css">
 	
       <link rel="alternate" href="/atom.xml" title="Security Learning" type="application/atom+xml">
@@ -31,11 +31,19 @@
 	<main>
 		<article>
 	
-		<h1></h1>
+		<h1>自顶向下计算机网络知识笔记(三)</h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-04-29</span><br>
 		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/Computer-Network/">Computer Network</a>
+			</span><br>
+		
+		
+			<span class="article__tags">
+			  	<a class="article__tag-link" href="/tags/Notebook/">Notebook</a>
+			</span>
 		
 	</div>
 
@@ -170,7 +178,7 @@
 <li>当计时器过期时。需要重传所有的数据包</li>
 </ul>
 </li>
-<li><p>Selective Repeat(SR,选择重传</p>
+<li><p>Selective Repeat(SR,选择重传)</p>
 <ul>
 <li>同样允许流水线中存在N个未被确认的数据包</li>
 <li>接收者是独立确认每一个包</li>
@@ -232,12 +240,12 @@
 </li>
 <li><p>GBN 接收者</p>
 <ul>
-<li><p>始终发送序列号最高（及最近发生）的正确接收的数据包的ACK</p>
+<li><p>始终发送序列号最高(及最近发生)的正确接收的数据包的ACK</p>
 <ul>
 <li>可能会造成冗余的ACK‘</li>
 </ul>
 </li>
-<li><p>对于乱序的包，一律丢掉（丢掉所有损坏，以及不是期待编号的包</p>
+<li><p>对于乱序的包，一律丢掉（丢掉所有损坏，以及不是期待编号的包)</p>
 </li>
 <li>sender有buffer,但是receiver没有</li>
 </ul>
@@ -310,29 +318,29 @@
 </li>
 </ul>
 <h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><ul>
-<li><p>Checksum(first rdt 2.0</p>
+<li><p>Checksum(first rdt 2.0)</p>
 <ul>
 <li>用于检测传输包是否有bit errors</li>
 </ul>
 </li>
-<li><p>Acknowledgment(first rdt 2.0</p>
+<li><p>Acknowledgment(first rdt 2.0)</p>
 <ul>
 <li>由接收方传给发送方，表明包已经被正确的接收</li>
 </ul>
 </li>
-<li><p>Negative Acknowledgment (first rdt 2.0</p>
+<li><p>Negative Acknowledgment (first rdt 2.0)</p>
 <ul>
 <li>由接收方传给发送方，表明包未被正确的接收</li>
 </ul>
 </li>
-<li><p>Sequence Number(first rdt 2.1</p>
+<li><p>Sequence Number(first rdt 2.1)</p>
 <ul>
 <li>接收数据包中序列号的gap或冗余，用来表明包的丢失或冗余</li>
 </ul>
 </li>
-<li><p>Timer(first rdt 3.0</p>
+<li><p>Timer(first rdt 3.0)</p>
 </li>
-<li><p>Window,pipeling(first rdt 3.1</p>
+<li><p>Window,pipeling(first rdt 3.1)</p>
 <ul>
 <li>允许多个包被传输且不被ack，发送者的效率高于stop-and-wait的模式</li>
 <li>window size由接收者的能力，buffer,level of congestion in the network决定</li>
@@ -343,7 +351,7 @@
 <li><p>point-to-point</p>
 <ul>
 <li>同一个连接中只允许有一个接收者，一个发送者</li>
-<li>不支持多播的形式(multicasting</li>
+<li>不支持多播的形式(multicasting)</li>
 </ul>
 </li>
 <li><p>reliable,in-order byte steam</p>
@@ -353,7 +361,7 @@
 <li>TCP的congestion,flow control来设置window size</li>
 </ul>
 </li>
-<li><p>full duplex data(全双工数据</p>
+<li><p>full duplex data(全双工数据)</p>
 <ul>
 <li>同一连接中可以有双向(bi-directional)数据流</li>
 <li>MSS:最大报文段长度：传输层能够承载的应用层最大数据长度，不包括传输层头部</li>
@@ -380,9 +388,9 @@
 <li>URG：紧急数据</li>
 </ul>
 </li>
-<li><p>seq number(序列号</p>
+<li><p>seq number(序列号)</p>
 <ul>
-<li>first byte in segment’s data(首个字节数据的编号</li>
+<li>first byte in segment’s data(首个字节数据的编号)</li>
 <li>它是通过数据的字节来看的，而不是直接看报文的序列</li>
 <li><p>接收者如何处理乱序的报文？</p>
 <ul>
@@ -398,7 +406,7 @@
 <ul>
 <li>不同于rdt3.0</li>
 <li>接收方期待从发送方收到的字节数据的序列号</li>
-<li>cumulative ACK(TCP采用累积确认</li>
+<li>cumulative ACK(TCP采用累积确认)</li>
 <li><p>example 1</p>
 <ul>
 <li>Host R has received bytes from 0-535from host S, is about to send segment to host S with 536in ACK# field</li>
@@ -434,7 +442,7 @@
 <li>EstimatedRTT=(1-α)<em>EstimatedRTT+α</em>SampleRTT</li>
 <li>α为exponential weighted moving average 指数加权移动平均值(EWMA)</li>
 <li>influence of past sample decreases exponentially fast过去样本的<br>影响呈指数级下降</li>
-<li>α = 0.125(typical value</li>
+<li>α = 0.125(typical value)</li>
 </ul>
 </li>
 <li><p>how to set timeout?</p>
@@ -454,17 +462,17 @@
 </li>
 </ul>
 <h3 id="可靠传输"><a href="#可靠传输" class="headerlink" title="可靠传输"></a>可靠传输</h3><ul>
-<li><p>TCP基于IP的不可靠服务建立了可靠服务(rdt</p>
+<li><p>TCP基于IP的不可靠服务建立了可靠服务(rdt)</p>
 <ul>
-<li>pipelined segments(流水线报文段，与GBN相似</li>
-<li>cumulative acks(累计确认</li>
-<li>single retransmission timer(单个重传定时器</li>
+<li>pipelined segments(流水线报文段，与GBN相似)</li>
+<li>cumulative acks(累计确认)</li>
+<li>single retransmission timer(单个重传定时器)</li>
 </ul>
 </li>
 <li><p>触发重传的事件</p>
 <ul>
-<li>timeout events(超时事件</li>
-<li>duplicate acks(冗余ACK</li>
+<li>timeout events(超时事件)</li>
+<li>duplicate acks(冗余ACK)</li>
 </ul>
 </li>
 <li><p>TCP 发送方三个重要事件</p>
@@ -569,7 +577,15 @@
 </ul>
 </li>
 </ul>
-<h2 id="multiplexing-and-demutiplexing-多路复用与多路分解"><a href="#multiplexing-and-demutiplexing-多路复用与多路分解" class="headerlink" title="multiplexing and demutiplexing(多路复用与多路分解"></a>multiplexing and demutiplexing(多路复用与多路分解</h2><h3 id="multiplexing-at-sender：处理不同套接字的数据，增加transport-header-为了后面用于多路分解"><a href="#multiplexing-at-sender：处理不同套接字的数据，增加transport-header-为了后面用于多路分解" class="headerlink" title="multiplexing at sender：处理不同套接字的数据，增加transport header(为了后面用于多路分解"></a>multiplexing at sender：处理不同套接字的数据，增加transport header(为了后面用于多路分解</h3><h3 id="demultiplexing-at-receiver：-利用header-info将接收到的报文发送到正确的套接字中"><a href="#demultiplexing-at-receiver：-利用header-info将接收到的报文发送到正确的套接字中" class="headerlink" title="demultiplexing at receiver： 利用header info将接收到的报文发送到正确的套接字中"></a>demultiplexing at receiver： 利用header info将接收到的报文发送到正确的套接字中</h3><h3 id="多路分解中，主机利用IP地址和端口号将报文指向合适的套接字"><a href="#多路分解中，主机利用IP地址和端口号将报文指向合适的套接字" class="headerlink" title="多路分解中，主机利用IP地址和端口号将报文指向合适的套接字"></a>多路分解中，主机利用IP地址和端口号将报文指向合适的套接字</h3><h3 id="Port-number"><a href="#Port-number" class="headerlink" title="Port number"></a>Port number</h3><ul>
+<h2 id="multiplexing-and-demutiplexing-多路复用与多路分解"><a href="#multiplexing-and-demutiplexing-多路复用与多路分解" class="headerlink" title="multiplexing and demutiplexing(多路复用与多路分解)"></a>multiplexing and demutiplexing(多路复用与多路分解)</h2><ul>
+<li><p>multiplexing at sender：处理不同套接字的数据，增加transport header(为了后面用于多路分解</p>
+</li>
+<li><p>demultiplexing at receiver： 利用header info将接收到的报文发送到正确的套接字中</p>
+</li>
+<li><p>多路分解中，主机利用IP地址和端口号将报文指向合适的套接字</p>
+</li>
+</ul>
+<h3 id="Port-number"><a href="#Port-number" class="headerlink" title="Port number"></a>Port number</h3><ul>
 <li>port number是一个16-bit的数字,from 0 to 65535</li>
 <li>0 to 1023 well-known port numbers</li>
 <li>1024 to 65535 dynamic and/or private ports</li>
@@ -601,8 +617,8 @@
 <ul>
 <li>DNS</li>
 <li>RIP(Routing Information Protocol</li>
-<li>SNMP(Simple Network Management Protocol</li>
-<li>streaming multimedia apps(loss tolerant,rate sensitive</li>
+<li>SNMP(Simple Network Management Protocol)</li>
+<li>streaming multimedia apps(loss tolerant,rate sensitive)</li>
 </ul>
 </li>
 <li><p>reliable transfer over UDP</p>
@@ -628,7 +644,7 @@
 <li>每个字段都是2 bytes</li>
 <li>source port</li>
 <li>dest port</li>
-<li>length(including header</li>
+<li>length(including header)</li>
 <li>checksum</li>
 </ul>
 <h3 id="Checksum"><a href="#Checksum" class="headerlink" title="Checksum"></a>Checksum</h3><ul>
