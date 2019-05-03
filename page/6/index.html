@@ -37,18 +37,18 @@
 
 	<article>
 	
-		<h1><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></h1>
+		<h1><a href="/2019/04/14/deadlock-problem/">哲学家就餐问题详解</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-04-08</span><br>
+		<span class="article__date">2019-04-14</span><br>
 		
 			<span class="article__category">
-				<a class="article-category-link" href="/categories/Bugs/">Bugs</a>
+				<a class="article-category-link" href="/categories/OS/">OS</a>
 			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/flask/">flask</a> <a class="article__tag-link" href="/tags/python/">python</a>
+			  	<a class="article__tag-link" href="/tags/Deadlock/">Deadlock</a>
 			</span>
 		
 	</div>
@@ -56,12 +56,25 @@
 	
 
 	
-		<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
-<blockquote>
-<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
+		<blockquote>
+<p>问题：有五个哲学家，他们的生活方式是交替地进行思考和进餐。他们共用一张圆桌，分别坐在五张椅子上。在圆桌上有五个碗和五支叉子，平时一个哲学家进行思考，饥饿时便试图取用其左、右最靠近他的叉子，只有在他拿到两支叉子时才能进餐。进餐完毕，放下叉子又继续思考。</p>
 </blockquote>
-<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&apos;utf-8&apos;) #修改默认编码方式</span><br></pre></td></tr></table></figure>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>题目中明确不允许死锁的发生，所以排除无为而治的方法（鸵鸟算法）与死锁检测。</p>
+<h4 id="静态方法（死锁预防）"><a href="#静态方法（死锁预防）" class="headerlink" title="静态方法（死锁预防）"></a>静态方法（死锁预防）</h4><p><strong>互斥：</strong> 需要六把叉子或者是吃饭的时候共享叉子，与题意不符。</p>
+<p><strong>保持占有：</strong> 一次性拿两把叉子。</p>
+<p><strong>抢占：</strong> 不符合哲学家的身份。</p>
+<p><strong>设定资源访问顺序：</strong> 假设第一个哲学家年龄最大，那么第二个和第五个哲学家就要让他先吃。</p>
+<h4 id="动态方法（死锁避免）"><a href="#动态方法（死锁避免）" class="headerlink" title="动态方法（死锁避免）"></a>动态方法（死锁避免）</h4><p>采用银行家算法：哲学家在每次拿动叉子的时候，先进行判断是否会出现死锁，如果可能出现，哲学家就不拿叉子。</p>
+<h3 id="解题伪代码"><a href="#解题伪代码" class="headerlink" title="解题伪代码"></a>解题伪代码</h3><h4 id="方法0"><a href="#方法0" class="headerlink" title="方法0"></a>方法0</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">semophore fork[5]=&#123;1&#125;;</span><br><span class="line">int i;</span><br><span class="line"></span><br><span class="line">void philosopher(int i)&#123;</span><br><span class="line">    while(1)&#123;</span><br><span class="line">        think();</span><br><span class="line">        wait(fork[i]);</span><br><span class="line">        wait(fork[(i+1) mod 5])</span><br><span class="line">        eat();</span><br><span class="line">        signal(fork[i]);</span><br><span class="line">        signal(fork[(i+1) mod 5])</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> int main()&#123;</span><br><span class="line">     parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4))</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>该方法可以保证不会有两位相邻的哲学家同时进餐。但是如果五位哲学家同时拿走了右边的叉子，他们每一个人都将会因为没有筷子而无期限的等待，造成思锁问题。</p>
+<hr>
+<h4 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h4><p>思路：至多只允许四位哲学家就餐，由鸽笼原理可以得到至少有一位哲学家能够就餐，所以不会发生死锁。这时，需要引入新的信号量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">semophore fork[5]=&#123;1&#125;;</span><br><span class="line">semophore room=4;</span><br><span class="line">int i;</span><br><span class="line"></span><br><span class="line">void philosopher(int i)&#123;</span><br><span class="line">    while(1)&#123;</span><br><span class="line">        think();</span><br><span class="line">        wait(room);</span><br><span class="line">        wait(fork[i]);</span><br><span class="line">        wait(fork[(i+1) mod 5])</span><br><span class="line">        eat();</span><br><span class="line">        signal(fork[i]);</span><br><span class="line">        signal(fork[(i+1) mod 5])</span><br><span class="line">        signal(room)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> int main()&#123;</span><br><span class="line">     parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4))</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h4><p>思路：仅当哲学家左右的筷子同时拿起时才允许进餐（一次性请求全部的资源且不允许抢占）。这时，需要引入一个信号量mutex来对取左边叉子和右边叉子时进行互斥保护。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">semaphore mutex=1;</span><br><span class="line">semophore fork[5]=&#123;1&#125;;</span><br><span class="line">int i;</span><br><span class="line"></span><br><span class="line">void philosopher(int i)&#123;</span><br><span class="line">    while(1)&#123;</span><br><span class="line">        think();</span><br><span class="line">        wait(mutex);</span><br><span class="line">        wait(fork[i]);</span><br><span class="line">        wait(fork[(i+1) mod 5])</span><br><span class="line">        signal(mutex);</span><br><span class="line">        eat();</span><br><span class="line">        signal(fork[i]);</span><br><span class="line">        signal(fork[(i+1) mod 5])</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> int main()&#123;</span><br><span class="line">     parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4))</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方法3"><a href="#方法3" class="headerlink" title="方法3"></a>方法3</h4><p>思路：设置资源访问顺序，引入两个信号量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">semophore fork[5]=&#123;1&#125;;</span><br><span class="line">semaphore s1=0,s2=0;</span><br><span class="line">int i;</span><br><span class="line"></span><br><span class="line">void philosopher(int i)&#123;</span><br><span class="line">    while(1)&#123;</span><br><span class="line">        think();</span><br><span class="line">        if((i mod 5)==1)&#123;</span><br><span class="line">            wait(s1);</span><br><span class="line">        &#125;</span><br><span class="line">        if((i mod 5)==4)&#123;</span><br><span class="line">            wait(s2);</span><br><span class="line">        &#125;</span><br><span class="line">        wait(fork[i]);</span><br><span class="line">        wait(fork[(i+1) mod 5])</span><br><span class="line">        eat();</span><br><span class="line">        signal(fork[i]);</span><br><span class="line">        signal(fork[(i+1) mod 5])</span><br><span class="line"></span><br><span class="line">        if((i mod 5)==0)&#123;</span><br><span class="line">            signal(s1);</span><br><span class="line">            signal(s2);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> int main()&#123;</span><br><span class="line">     parbegin(philosopher(0),philosopher(1)，philosopher(2)，philosopher(3)，philosopher(4))</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="方法4（银行家算法）"><a href="#方法4（银行家算法）" class="headerlink" title="方法4（银行家算法）"></a>方法4（银行家算法）</h4>
 	
 
 	

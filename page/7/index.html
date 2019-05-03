@@ -37,18 +37,18 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></h1>
+		<h1><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br>
+		<span class="article__date">2019-04-08</span><br>
 		
 			<span class="article__category">
-				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
+				<a class="article-category-link" href="/categories/Bugs/">Bugs</a>
 			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
+			  	<a class="article__tag-link" href="/tags/python/">python</a>
 			</span>
 		
 	</div>
@@ -56,19 +56,34 @@
 	
 
 	
-		<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote>
-<p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
+		<ol>
+<li><p>字符编码类型</p>
+<ul>
+<li>python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。</li>
+<li>python3统一使用unicode字符,节省了开发者时间。</li>
+</ul>
+</li>
+</ol>
+<h4 id="兼容技巧"><a href="#兼容技巧" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>字符串赋值之前均使用前缀u</li>
+<li>引入unicode_literals</li>
+</ol>
 <hr>
-<h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote>
-<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
-<hr>
-<h4 id="CBC攻击"><a href="#CBC攻击" class="headerlink" title="CBC攻击"></a>CBC攻击</h4><p><strong>攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.<br>主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文</strong></p>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dd24bba15.jpg" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p>
-<h4 id="实际应用-Bugku-login4"><a href="#实际应用-Bugku-login4" class="headerlink" title="实际应用:Bugku-login4"></a>实际应用:Bugku-login4</h4><p><a href="http://123.206.31.85:49168/" target="_blank" rel="noopener">login4</a></p>
+<ol start="2">
+<li><p>导入模块的路径搜索方式</p>
+<ul>
+<li>python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。</li>
+<li>python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。</li>
+</ul>
+</li>
+</ol>
+<h4 id="兼容技巧-1"><a href="#兼容技巧-1" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>统一使用绝对路径进行自定义模块导入</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">path=os.path.abspath()</span><br><span class="line">sys.path.append(path)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。</li>
+</ol>
 
 	
 
@@ -80,8 +95,8 @@
 
 
 
+	<span class="different-posts">📖 <a href="/page/8">more posts</a> 📖</span>
 
-	<span class="different-posts">📕 end of posts 📕</span>
 
 
 	</main>

@@ -29,81 +29,46 @@
 	</header>
 
 	<main>
-		
+		<h1>Archive</h1>
 
-<h1>#python</h1>
+
 
 
 
 <ul class="archive">
-		<li class="archive__year archive__expendable archive__expendable_disabled">
+	
+	
+		<li class="archive__year archive__expendable ">
+			<span>2019</span>
 			<ul>
-			
 				
-					
-					
-						<li class="archive__entry"><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></li>
-					
+					<li class="archive__month archive__expendable">
+						<span>May</span>
+						<ul>
+							
+								<li class="archive__entry"><a href="/2019/05/03/nachos2/">NachOS源码学习(二)：同步机制</a></li>
+							
+								<li class="archive__entry"><a href="/2019/05/03/nachos1/">NachOS源码学习(一)：线程升级</a></li>
+							
+						</ul>
+					</li>
 
 				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/04/08/bug-flask/">flask jinja2 UnicodeDecodeError 解决方法</a></li>
-					
-
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
 			</ul>
 		</li>
+		
+	
 </ul>
+
+<script>
+	const expandables = document.querySelectorAll('.archive__expendable')
+	for(let i = 0; i < expandables.length; i++) {
+		expandables[i].addEventListener('click', (e) => {
+			e.stopPropagation()
+			expandables[i].classList.toggle('archive__expendable_collapsed')
+		})
+	}
+</script>
 
 	</main>
 
