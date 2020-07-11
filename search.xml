@@ -208,9 +208,9 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[其他类型注入的详解(1)]]></title>
-    <url>%2F2019%2F03%2F16%2Fsql2%2F</url>
-    <content type="text"><![CDATA[1.二次注入 形成原理:在第一次进入数据库插入数据的时候,仅仅只是使用了addslashes或者是借助get_magic_quotes_gpc对其中的特殊字符进行转义,但是addslashes有一个特点就是虽然在参数前会添加’\’进行转义,但是’\’并不会进入数据库中,再写入数据库时还是保留了原来输入的数据.在下一次需要查询时就直接从数据库中取出了能够构成payload的语句.比如在第一次注入时写入了单引号,就可以形成二次注入。 Tips:一般题目中都会存在登陆注册两种功能(当然也不排除session文件包含) 例子:(sqli-labs less-24) 首先进入搭建好的sqli-labs less-24 注册一个新的账号admin&#39;# 1.png 查看此时数据库中已经多出一个账号了并且特殊符号没有被转义 2.png 我们尝试着登陆进去,会发现可以更改当前用户的密码 3.png 到数据库查看可以发现admin的密码被修改了,而admin’#的密码没有 4.png 我们可以查看pass_change.php的代码,发现修改密码这里的sql语句“UPDATE users SET PASSWORD=’$pass’ where username=’$username’ and password=’$curr_pass’ “;5.png 我们可以看到如果将admin&#39;#带到里面去后:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;# and password=&#39;$curr_pass&#39; &quot;;实际上就是:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;这里后面的内容都被#注释掉了,这样就是在修改admin的密码了,我们再尝试登陆一下,发现利用admin也可以成功了 6.png]]></content>
+    <title><![CDATA[SQL注入学习总结(一):SQL注入的分类]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql1%2F</url>
+    <content type="text"><![CDATA[###1.按照执行效果分类 基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii()) 基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2) 基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark()) 堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行 回显注入,一般是可以使用union的情况下进行注入 ###2.按照注入点的类型来分类: 数字型(select * from 表名 where id=x),一般的判断语句 x and 1=1页面正常运行,继续进行下一步(x已确认存在数据) x and 1=2页面出错,说明该注入为数字型注入 字符型(select * from 表名 where id=’x’),一般判断的语句: x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1页面正常运行(#号也可能被过滤了导致不成功所以要多试) x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2页面出错,说明该注入为字符型 搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’) x%&#39; and &#39;1&#39;=&#39;1&#39;%23页面正常运行 x%&#39; and &#39;1&#39;=&#39;2&#39;%23页面出错,说明为一个搜索型的sql注入注:用or也可以进行判断的,不过他更多的用于绕过登录 ###3.按照数据提交的方式 GET注入 POST注入 Cookie注入 XFF等一些需要补充参数的HTTP头部注入]]></content>
       <categories>
         <category>Web Security</category>
       </categories>
@@ -219,9 +219,9 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[SQL注入学习总结(一):SQL注入的分类]]></title>
-    <url>%2F2019%2F03%2F16%2Fsql1%2F</url>
-    <content type="text"><![CDATA[###1.按照执行效果分类 基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii()) 基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2) 基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark()) 堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行 回显注入,一般是可以使用union的情况下进行注入 ###2.按照注入点的类型来分类: 数字型(select * from 表名 where id=x),一般的判断语句 x and 1=1页面正常运行,继续进行下一步(x已确认存在数据) x and 1=2页面出错,说明该注入为数字型注入 字符型(select * from 表名 where id=’x’),一般判断的语句: x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1页面正常运行(#号也可能被过滤了导致不成功所以要多试) x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2页面出错,说明该注入为字符型 搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’) x%&#39; and &#39;1&#39;=&#39;1&#39;%23页面正常运行 x%&#39; and &#39;1&#39;=&#39;2&#39;%23页面出错,说明为一个搜索型的sql注入注:用or也可以进行判断的,不过他更多的用于绕过登录 ###3.按照数据提交的方式 GET注入 POST注入 Cookie注入 XFF等一些需要补充参数的HTTP头部注入]]></content>
+    <title><![CDATA[其他类型注入的详解(1)]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql2%2F</url>
+    <content type="text"><![CDATA[1.二次注入 形成原理:在第一次进入数据库插入数据的时候,仅仅只是使用了addslashes或者是借助get_magic_quotes_gpc对其中的特殊字符进行转义,但是addslashes有一个特点就是虽然在参数前会添加’\’进行转义,但是’\’并不会进入数据库中,再写入数据库时还是保留了原来输入的数据.在下一次需要查询时就直接从数据库中取出了能够构成payload的语句.比如在第一次注入时写入了单引号,就可以形成二次注入。 Tips:一般题目中都会存在登陆注册两种功能(当然也不排除session文件包含) 例子:(sqli-labs less-24) 首先进入搭建好的sqli-labs less-24 注册一个新的账号admin&#39;# 1.png 查看此时数据库中已经多出一个账号了并且特殊符号没有被转义 2.png 我们尝试着登陆进去,会发现可以更改当前用户的密码 3.png 到数据库查看可以发现admin的密码被修改了,而admin’#的密码没有 4.png 我们可以查看pass_change.php的代码,发现修改密码这里的sql语句“UPDATE users SET PASSWORD=’$pass’ where username=’$username’ and password=’$curr_pass’ “;5.png 我们可以看到如果将admin&#39;#带到里面去后:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;# and password=&#39;$curr_pass&#39; &quot;;实际上就是:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;这里后面的内容都被#注释掉了,这样就是在修改admin的密码了,我们再尝试登陆一下,发现利用admin也可以成功了 6.png]]></content>
       <categories>
         <category>Web Security</category>
       </categories>
