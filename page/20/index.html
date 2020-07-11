@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></h1>
+		<h1><a href="/2019/03/16/sql3/">其他类型注入的详解(2)</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,19 +56,8 @@
 	
 
 	
-		<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote>
-<p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
-<hr>
-<h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote>
-<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
-<hr>
-<h4 id="CBC攻击"><a href="#CBC攻击" class="headerlink" title="CBC攻击"></a>CBC攻击</h4><p><strong>攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.<br>主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文</strong></p>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dd24bba15.jpg" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p>
-<h4 id="实际应用-Bugku-login4"><a href="#实际应用-Bugku-login4" class="headerlink" title="实际应用:Bugku-login4"></a>实际应用:Bugku-login4</h4><p><a href="http://123.206.31.85:49168/" target="_blank" rel="noopener">login4</a></p>
+		<p>###2.截断注入</p>
+<p>参考题目:<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">wanna see your hat</a></p>
 
 	
 
@@ -80,8 +69,8 @@
 
 
 
+	<span class="different-posts">📖 <a href="/page/21">more posts</a> 📖</span>
 
-	<span class="different-posts">📕 end of posts 📕</span>
 
 
 	</main>

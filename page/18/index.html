@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql1/">SQL注入学习总结(一):SQL注入的分类</a></h1>
+		<h1><a href="/2019/03/16/sql8/">其他类型注入的详解(5)</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,35 +56,14 @@
 	
 
 	
-		<p>###1.按照执行效果分类</p>
-<ol>
-<li><p>基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii())</p>
-</li>
-<li><p>基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2)</p>
-</li>
-<li><p>基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark())</p>
-</li>
-<li><p>堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行</p>
-</li>
-<li><p>回显注入,一般是可以使用union的情况下进行注入</p>
-</li>
-</ol>
-<hr>
-<p>###2.按照注入点的类型来分类:</p>
-<ol>
-<li>数字型(select * from 表名 where id=x),一般的判断语句<br> <code>x and 1=1</code>页面正常运行,继续进行下一步(x已确认存在数据)<br> <code>x and 1=2</code>页面出错,说明该注入为数字型注入</li>
-<li>字符型(select * from 表名 where id=’x’),一般判断的语句:<br> <code>x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1</code>页面正常运行(#号也可能被过滤了导致不成功所以要多试)<br> <code>x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2</code>页面出错,说明该注入为字符型</li>
-<li>搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’)<br> <code>x%&#39; and &#39;1&#39;=&#39;1&#39;%23</code>页面正常运行<br> <code>x%&#39; and &#39;1&#39;=&#39;2&#39;%23</code>页面出错,说明为一个搜索型的sql注入<br>注:用or也可以进行判断的,不过他更多的用于绕过登录</li>
-</ol>
-<hr>
-<p>###3.按照数据提交的方式</p>
-<ol>
-<li>GET注入</li>
-<li>POST注入</li>
-<li>Cookie注入</li>
-<li>XFF等一些需要补充参数的HTTP头部注入</li>
-</ol>
-<hr>
+		<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p>
+<h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul>
+<li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`
+</code></pre></li>
+<li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li>
+</ul>
+<p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
+<h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>
 
 	
 
