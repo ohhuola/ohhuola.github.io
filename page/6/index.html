@@ -37,18 +37,18 @@
 
 	<article>
 	
-		<h1><a href="/2019/05/13/nachos3/">NachOS源码学习(三):内存管理</a></h1>
+		<h1><a href="/2019/04/29/Transport layer/">自顶向下计算机网络知识笔记(三)</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-05-13</span><br>
+		<span class="article__date">2019-04-29</span><br>
 		
 			<span class="article__category">
-				<a class="article-category-link" href="/categories/OS/">OS</a>
+				<a class="article-category-link" href="/categories/Computer-Network/">Computer Network</a>
 			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/NachOS/">NachOS</a>
+			  	<a class="article__tag-link" href="/tags/Notebook/">Notebook</a>
 			</span>
 		
 	</div>
@@ -56,17 +56,879 @@
 	
 
 	
-		<h3 id="阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制"><a href="#阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制" class="headerlink" title="阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制"></a>阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制</h3><h4 id="translate-h-cc"><a href="#translate-h-cc" class="headerlink" title="translate.h(cc)"></a>translate.h(cc)</h4><ul>
-<li>定义了TranslationEntry类，包括virtualPage,physicalPage以及一些标志位:valid,redonly等。</li>
-<li>标识了用户空间的第i个虚拟页应该映射到主存的第j个物理页，且当前这个物理页所处的状态。</li>
-<li><p>Translate()函数接收虚拟地址，物理地址，页尺寸，是否写入为参数。将虚拟地址转换为实际地址。</p>
-<h4 id="machine-h-cc"><a href="#machine-h-cc" class="headerlink" title="machine.h(cc)"></a>machine.h(cc)</h4></li>
-<li><p>定义了页尺寸,物理内存中的帧数,内存中容量,TLB的大小。</p>
+		<h1 id="Transport-layer"><a href="#Transport-layer" class="headerlink" title="Transport layer"></a>Transport layer</h1><h2 id="可靠传输的原理"><a href="#可靠传输的原理" class="headerlink" title="可靠传输的原理"></a>可靠传输的原理</h2><h3 id="不可靠信道的特征将会决定可靠传输协议的复杂性"><a href="#不可靠信道的特征将会决定可靠传输协议的复杂性" class="headerlink" title="不可靠信道的特征将会决定可靠传输协议的复杂性"></a>不可靠信道的特征将会决定可靠传输协议的复杂性</h3><h3 id="rdt"><a href="#rdt" class="headerlink" title="rdt"></a>rdt</h3><ul>
+<li>只考虑单向的数据传输</li>
+<li>使用finite state machine来描述sender,receiver的状态</li>
+<li><p>rdt1.0</p>
+<ul>
+<li><p>只考虑最简单的情况</p>
+<ul>
+<li>没有bit error</li>
+<li>没有loss packets</li>
+</ul>
 </li>
-<li>定义Machine类,用于模拟主机的硬件。</li>
-<li>Machine类中包含了一些重要的函数Run(),ReadRegister(),WriteRegister()</li>
-<li>遍历TLB数组，查找是否有对应的映射。</li>
-<li>如果有，TLB命中，直接进行物理地址转换；否则TLB miss,进入Exception处理。</li>
+</ul>
+</li>
+<li><p>rdt2.0</p>
+<ul>
+<li><p>可能会发生位的翻转(flip bits)</p>
+<ul>
+<li>依然假设包抵达receiver时是有序的，没有丢包的</li>
+<li>使用校验和(checksum)来检测bit error</li>
+<li><p>问题：如何恢复错误？</p>
+<ul>
+<li><p>receiver会发送两种包</p>
+<ul>
+<li>ACKs</li>
+<li><p>NAKs</p>
+<ul>
+<li>告诉发送者包有错误</li>
+<li>retransmit重传包</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>rdt2.0的新机制</p>
+<ul>
+<li>error detection</li>
+<li>feedback (control msg)</li>
+<li>retransmission</li>
+</ul>
+</li>
+<li><p>还采用了stop and wait的机制</p>
+<ul>
+<li>当发送者发送了一个包后就会等待接受者的响应</li>
+</ul>
+</li>
+<li><p>如果ACK/NAK损坏了呢？</p>
+<ul>
+<li>介绍一种新的sender-to-receiver packet</li>
+<li>增加checksum来让发送者检测和恢复，但对丢包无效</li>
+<li>发送者在接受到乱码的ACK/NAK的包时重传当前的数据</li>
+</ul>
+</li>
+<li><p>对于第三种方法，介绍冗余的数据包(duplicate packets)</p>
+<ul>
+<li>接受者不知道发送者是否正确的接受了ACK/NAK包</li>
+<li>因此不能知道到达的数据包时新的数据还是重传的</li>
+</ul>
+</li>
+<li><p>解决方案</p>
+<ul>
+<li>为每一个包加上sequence number(序号)</li>
+<li>只需要添加1-bit的序列号就行了</li>
+<li>上述就是rdt2.1</li>
+</ul>
+</li>
+<li><p>rdt2.2 NAK free</p>
+<ul>
+<li>接受者发送上一个正确的包的ACK</li>
+<li>为ACK包也加上序号，表明是哪一个包的ACK</li>
+<li>冗余的ACK会导致与NAK相同的动作：让发送者重传当前的包</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>rdt3.0(alternating-bit protocol)比特交替协议</p>
+<ul>
+<li>新的假设：data,ACKs可能会丢包，校验和，序列，ACKs,重传还不够帮助检测丢包</li>
+<li><p>approach</p>
+<ul>
+<li>sender等待ACK合理的时间</li>
+<li>如果没有接收到ACK就重传</li>
+<li><p>如果ACK的包只是延迟了</p>
+<ul>
+<li>重传就会使接收方收到冗余数据</li>
+<li>接收者一定要标明ACK的序号</li>
+</ul>
+</li>
+<li><p>需要countdown timer倒数计时器</p>
+<ul>
+<li>发送者是在传输数据包时就启动计时器，在收到正确的ACK报文时停止计时器</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>即使是收到了损坏的或者序列号不正确的ACK包，也不重传，只在超时时重传并且重置计时器</p>
+</li>
+<li>rdt3.0性能非常的差stinks,因为一次就传输一个包并且开始等待。stop-and-wait会限制物理资源的使用</li>
+<li>RTT是不算传输时间的</li>
+</ul>
+</li>
+<li><p>改善：Pipelined protocols(流水线协议)</p>
+<ul>
+<li>允许发送者有多个，在传输中，未被确认的包</li>
+<li>sequence numbers需要增加</li>
+<li>发送者/接收者处需要有buffer,来存储已发送但未被确认的包</li>
+</ul>
+</li>
+<li><p>两种常用的 pipelined protocols</p>
+<ul>
+<li><p>go-Back-N,（GBN,回退N步</p>
+<ul>
+<li>允许流水线中存在N个未被确认的数据包</li>
+<li><p>接收者采用累计确认(cumulative ack)</p>
+<ul>
+<li>如果接收到的包的序列号与累计确认值有gap,那么就不会接收这个包</li>
+</ul>
+</li>
+<li><p>最早未被确认的数据维护一个定时器</p>
+</li>
+<li>当计时器过期时。需要重传所有的数据包</li>
+</ul>
+</li>
+<li><p>selective repeat(SR,选择重传</p>
+<ul>
+<li>同样允许流水线中存在N个未被确认的数据包</li>
+<li>接收者是独立确认每一个包</li>
+<li>每个未确认的数据包维护一个定时器</li>
+<li>当timer过期时，仅仅重传未被确认的数据包</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Go-Back-N"><a href="#Go-Back-N" class="headerlink" title="Go Back N"></a>Go Back N</h3><ul>
+<li><p>window size N</p>
+<ul>
+<li>流水线中允许连续未被确认包(也可以是未发送的)的最大数量</li>
+</ul>
+</li>
+<li><p>send_base</p>
+<ul>
+<li>最早未被确认的包的序列号</li>
+</ul>
+</li>
+<li><p>nextseqnum</p>
+<ul>
+<li>最小的未被使用的序列号</li>
+</ul>
+</li>
+<li><p>数据包的数量不允许是无限的，因为flow control和congestion control</p>
+</li>
+<li>k-bits seq #，tcp是有32-bit的序列号</li>
+<li>当sender接收到ACK之后滑动窗口</li>
+<li><p>GBN 发送者必须响应的三种事件</p>
+<ul>
+<li><p>被应用层调用，首先判断nextseqnum是否大于seq_base+N,这代表着window是否已满</p>
+<ul>
+<li><p>若满</p>
+<ul>
+<li>将数据返回给应用层</li>
+</ul>
+</li>
+<li><p>未满</p>
+<ul>
+<li>创建数据包，发送</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>收到ACK，ACK(n)</p>
+<ul>
+<li>序列号n即之前的所有数据包都已经被确认了</li>
+<li>可能会收到冗余的数据包</li>
+</ul>
+</li>
+<li><p>超时事件,timeout(n)</p>
+<ul>
+<li>重传序列号为n,以及更高序列号的包</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>GBN 接收者</p>
+<ul>
+<li><p>始终发送序列号最高（及最近发生）的正确接收的数据包的ACK</p>
+<ul>
+<li>可能会造成冗余的ACK‘</li>
+</ul>
+</li>
+<li><p>对于乱序的包，一律丢掉（丢掉所有损坏，以及不是期待编号的包</p>
+</li>
+<li>sender有buffer,但是receiver没有</li>
+</ul>
+</li>
+</ul>
+<h3 id="Selective-Repeat"><a href="#Selective-Repeat" class="headerlink" title="Selective Repeat"></a>Selective Repeat</h3><ul>
+<li>GBN的问题：如果带宽延迟和窗口大小较大会导致很多包重传</li>
+<li>只重传那些未确认的包</li>
+<li><p>发送者</p>
+<ul>
+<li>也使用window，N个连续的序列号可用</li>
+<li>用于已发送，但未确认的包</li>
+</ul>
+</li>
+<li><p>接收者</p>
+<ul>
+<li>独立的确认所有被正确接收的包</li>
+<li>缓存接收到的包，以便将其有序的发送给上层</li>
+</ul>
+</li>
+<li><p>接收者与发送者都有窗口</p>
+<ul>
+<li><p>sender</p>
+<ul>
+<li>当有来自上层的数据时，如果有可用的序列号，则发送包</li>
+<li>timeout(n),重发包n，并且重启timer</li>
+<li><p>ACK(n) in [sendbase,sendbase+n-1]</p>
+<ul>
+<li>标志着标志n被接受了</li>
+<li>如果n是序列号最小的未确认的包，则接收后需要将窗口移动到下一个未确认包的序列上</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>receiver</p>
+<ul>
+<li><p>pkt n in [rcvbase,rcvbase+N-1]</p>
+<ul>
+<li>send ACK(n)</li>
+<li><p>如果out-of-order</p>
+<ul>
+<li>则放入到buffer中，不做窗口移动</li>
+</ul>
+</li>
+<li><p>如果in-order</p>
+<ul>
+<li>依旧是放入到buffer中去，只不过还要移动窗口，到下一个未被接收(not-yet-received)的包</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>pkt n in [rcvbase-N,rcvbase-1]</p>
+<ul>
+<li>send ACK(n)</li>
+</ul>
+</li>
+<li><p>otherwise</p>
+<ul>
+<li>ignore</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>SR的缺点</p>
+<ul>
+<li>当接收到in-order的包的时候，receiver方无法判断是重传的包，还是新数据，它在这两种情况下会做出相同的反应：放入buffer,并移动窗口</li>
+</ul>
+</li>
+</ul>
+<h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><ul>
+<li><p>Checksum(first rdt 2.0</p>
+<ul>
+<li>用于检测传输包是否有bit errors</li>
+</ul>
+</li>
+<li><p>Acknowledgment(first rdt 2.0</p>
+<ul>
+<li>由接收方传给发送方，表明包已经被正确的接收</li>
+</ul>
+</li>
+<li><p>Negative Acknowledgment (first rdt 2.0</p>
+<ul>
+<li>由接收方传给发送方，表明包未被正确的接收</li>
+</ul>
+</li>
+<li><p>Sequence Number(first rdt 2.1</p>
+<ul>
+<li>接收数据包中序列号的gap或冗余，用来表明包的丢失或冗余</li>
+</ul>
+</li>
+<li><p>Timer(first rdt 3.0</p>
+</li>
+<li><p>Window,pipeling(first rdt 3.1</p>
+<ul>
+<li>允许多个包被传输且不被ack，发送者的效率高于stop-and-wait的模式</li>
+<li>window size由接收者的能力，buffer,level of congestion in the network决定</li>
+</ul>
+</li>
+</ul>
+<h2 id="Connection-oriented-transport-TCP"><a href="#Connection-oriented-transport-TCP" class="headerlink" title="Connection-oriented transport:TCP"></a>Connection-oriented transport:TCP</h2><h3 id="Overviews"><a href="#Overviews" class="headerlink" title="Overviews"></a>Overviews</h3><ul>
+<li><p>point-to-point</p>
+<ul>
+<li>同一个连接中只允许有一个接收者，一个发送者</li>
+<li>不支持多播的形式(multicasting</li>
+</ul>
+</li>
+<li><p>reliable,in-order byte steam</p>
+</li>
+<li><p>pipelined(流水线)</p>
+<ul>
+<li>TCP的congestion,flow control来设置window size</li>
+</ul>
+</li>
+<li><p>full duplex data(全双工数据</p>
+<ul>
+<li>同一连接中可以有双向(bi-directional)数据流</li>
+<li>MSS:最大报文段长度：传输层能够承载的应用层最大数据长度，不包括传输层头部</li>
+</ul>
+</li>
+<li><p>connection-oriented</p>
+<ul>
+<li>数据交换前通过握手(handshaking)来初始化sender,receiver</li>
+</ul>
+</li>
+<li><p>flow controlled</p>
+<ul>
+<li>sender will not overwhelm(覆没) receiver</li>
+</ul>
+</li>
+</ul>
+<h3 id="TCP报文结构"><a href="#TCP报文结构" class="headerlink" title="TCP报文结构"></a>TCP报文结构</h3><ul>
+<li><p>状态字段</p>
+<ul>
+<li>SYN：建立连接</li>
+<li>FIN：关闭连接</li>
+<li>PSH：有DATA传输</li>
+<li>RST：连接重置</li>
+<li>URG：紧急数据</li>
+</ul>
+</li>
+<li><p>seq number(序列号</p>
+<ul>
+<li>first byte in segment’s data(首个字节数据的编号</li>
+<li>它是通过数据的字节来看的，而不是直接看报文的序列</li>
+<li><p>接收者如何处理乱序的报文？</p>
+<ul>
+<li>留下乱序的字节(放在接收者的buffer中，等待缺失的字节来填补间隙</li>
+<li>keeps out-of-order bytes and waits for missing bytes to fill in the gaps (in practice)</li>
+</ul>
+</li>
+<li><p>接收方与发送方都是随机选择首个sequence number</p>
+</li>
+</ul>
+</li>
+<li><p>acknowledgements number</p>
+<ul>
+<li>不同于rdt3.0</li>
+<li>接收方期待从发送方收到的字节数据的序列号</li>
+<li>cumulative ACK(TCP采用累积确认</li>
+<li><p>example 1</p>
+<ul>
+<li>Host R has received bytes from 0-535from host S, is about to send segment to host S with 536in ACK# field</li>
+</ul>
+</li>
+<li><p>exmaple 2</p>
+<ul>
+<li>R has received 0-535, 900-1000, R’s next segment contain 536in ACK# field</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>RTT,timeout</p>
+<ul>
+<li><p>TCP如何设置重传时间？</p>
+<ul>
+<li>一定要大于RTT,但RTT也是一个变量</li>
+<li>太短：会导致过早timeout,很多不必要的重传</li>
+<li>太长：会导致对于报文丢失的反应迟缓</li>
+</ul>
+</li>
+<li><p>如何估计RTT?</p>
+<ul>
+<li><p>SampleRTT</p>
+<ul>
+<li>从报文开始传输到接收到ACK为RTT</li>
+<li>忽略了重传</li>
+<li>SampleRTT也是一个变量所以要去它近几次的平均值，而不只是当前的SampleRTT</li>
+</ul>
+</li>
+<li><p>EstimatedRTT</p>
+<ul>
+<li>EstimatedRTT=(1-α)<em>EstimatedRTT+α</em>SampleRTT</li>
+<li>α为exponential weighted moving average 指数加权移动平均值(EWMA)</li>
+<li>influence of past sample decreases exponentially fast过去样本的<br>影响呈指数级下降</li>
+<li>α = 0.125(typical value</li>
+</ul>
+</li>
+<li><p>how to set timeout?</p>
+<ul>
+<li>大于等于EstimatedRTT</li>
+<li>不能比EstimatedRTT大太多</li>
+<li>time interval:EstimatedRTT+saftey margin</li>
+<li>DevRTT(用于估算：采用RTT偏离来估计RTT的程度</li>
+<li>DevRTT= (1-β)<em>DevRTT+ β</em>|SampleRTT-EstimatedRTT|</li>
+<li>TimeoutInterval= EstimatedRTT+ 4*DevRTT</li>
+<li>如果采样RTT值波动较小，那么DevRTT值也越小，反之亦然</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="可靠传输"><a href="#可靠传输" class="headerlink" title="可靠传输"></a>可靠传输</h3><ul>
+<li><p>TCP基于IP的不可靠服务建立了可靠服务(rdt</p>
+<ul>
+<li>pipelined segments(流水线报文段，与GBN相似</li>
+<li>cumulative acks(累计确认</li>
+<li>single retransmission timer(单个重传定时器</li>
+</ul>
+</li>
+<li><p>触发重传的事件</p>
+<ul>
+<li>timeout events(超时事件</li>
+<li>duplicate acks(冗余ACK</li>
+</ul>
+</li>
+<li><p>TCP 发送方三个重要事件</p>
+<ul>
+<li><p>收到app层发送来的数据</p>
+<ul>
+<li>创建带有序列号的报文段</li>
+<li>序列号是报文段的字节流中的第一个字节</li>
+<li>timer放在最早未被确认的报文那里</li>
+</ul>
+</li>
+<li><p>timeout,超时</p>
+<ul>
+<li>重传导致超时事件的报文</li>
+<li>重启timer</li>
+</ul>
+</li>
+<li><p>收到ack</p>
+<ul>
+<li>累计确认，滑动窗口</li>
+<li>如果还有未被确认的报文，就需要启动timer</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>发送方的重要actions</p>
+<ul>
+<li>NextSeqNum= NextSeqNum+ length(data)</li>
+<li>当超时事件被触发时，仅重传最小序列号，未被确认的数据包</li>
+<li>上一点与GBN不同，当GBN协议重传最小序列号及其之后所有未被确认的数据</li>
+</ul>
+</li>
+<li><p>快速重传</p>
+<ul>
+<li>丢包一般是通过冗余的ACK来检测到</li>
+<li>当报文出现丢失时，就可能会有很多冗余的ACKs</li>
+<li>如果发送方收到了三个相同的ACKs,那么就不用等到超时，立刻进行重传</li>
+</ul>
+</li>
+<li><p>需要注意的问题</p>
+<ul>
+<li>seqNum与Ack都是以字节数为单位，所以ack的时候不能跳着确认，只能确认最大的连续收到的包，否则发送端就以为全部收到了，收到的乱序的包是放在接收者的buffer中等待</li>
+<li>当发送方收到ack=n时，会认为前面的包都收到了。所以如果发送了两个ack，但更小的ack没收到，也不需要重传</li>
+<li>当接收方收到了乱序的报文时，会立即发送冗余的ACK，指明下一个期待的报文编号</li>
+<li>累计确认类似于GBN</li>
+<li>接收方缓存乱序包类似于SR</li>
+</ul>
+</li>
+</ul>
+<h3 id="flow-control"><a href="#flow-control" class="headerlink" title="flow control"></a>flow control</h3><ul>
+<li>发送方的速率应当慢于接收方交付给应用层的速度</li>
+<li>接收方控制着发送方，所以发送方才不会传输太多太快覆没接收方的Buffer</li>
+<li>LastByteRead:应用层从接收方缓存中读取的最新一个字节的编号</li>
+<li>LastByteRcvd:到达接收方缓存最新字节数据的编号</li>
+<li>LastByteRcvd-LastByteRead&lt;=RcvBuffer</li>
+<li>rwnd:接收者缓存中的空闲空间；rwnd=RcvBuffer-[LastByteRcvd-LastByteRead]</li>
+<li>RcvBuffer通过socket option来设置</li>
+<li>接收者通过接收者的rwnd值来限制unacked包的数量，保证了接收者buffer不会overflow</li>
+</ul>
+<h3 id="TCP连接管理"><a href="#TCP连接管理" class="headerlink" title="TCP连接管理"></a>TCP连接管理</h3><ul>
+<li><p>初始化变量</p>
+<ul>
+<li>seq.#s</li>
+<li>buffers,flow control info</li>
+</ul>
+</li>
+<li><p>three way handshake</p>
+<ul>
+<li><p>用户发送SYN字段给服务端</p>
+<ul>
+<li>明确最初的用户序列号</li>
+<li>不能传输数据</li>
+</ul>
+</li>
+<li><p>服务器在接收到SYN之后，回复SYNACK字段</p>
+<ul>
+<li>服务器分配buffer和变量</li>
+<li>初始化服务器使用的序列</li>
+<li>不能传输数据</li>
+</ul>
+</li>
+<li><p>用户接收到SYNACK之后，返回ACK字段</p>
+<ul>
+<li>用户分配buffer和变量</li>
+<li>可以包含数据</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>关闭连接</p>
+<ul>
+<li>用户终端发送FIN控制字段给服务器</li>
+<li><p>服务器收到FIN，回复ACK。关闭连接，发送FIN给客户端</p>
+<ul>
+<li>注意：ACK与FIN是分开发送的</li>
+</ul>
+</li>
+<li><p>用户接收到FIN后，进入定时等待，回复ACK</p>
+<ul>
+<li>定时等待是为了让TCP客户端重发最后的ACK以防其丢包(如果又收到FIN表示丢包了)，时间通常是30 seconds, 1 minute, and 2 minutes.</li>
+</ul>
+</li>
+<li><p>服务器接收到ACK,连接关闭</p>
+</li>
+</ul>
+</li>
+<li><p>RST字段</p>
+<ul>
+<li>如果接收到的TCP报文中的端口号或源IP地址不匹配任何一个接收方的套接字</li>
+<li>主机会像该包中源IP地址的地方发送一个RST包，告诉他没有处理该报文段的套接字，不要在重发了</li>
+<li>如果是UDP报文，那么主机就发送一个ICMP的数据报</li>
+</ul>
+</li>
+<li><p>如何扫描目标主机端口号</p>
+<ul>
+<li><p>发送消息</p>
+<ul>
+<li>发送一个目标端口号为6789的TCP SYN报文段</li>
+</ul>
+</li>
+<li><p>接收消息</p>
+<ul>
+<li>如果从目的地接收TCP SYN ACK：应用程序正在运行TCP端口6789;</li>
+<li>如果从目标接收TCP RST：目标主机未使用TCP端口6789运行，攻击者知道该段到达主机并且未被防火墙阻止。</li>
+<li>如果什么都没收到：SYN段可能被防火墙阻止，从未到达目标主机</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>总结</p>
+<ul>
+<li>SYN segment:client initiate a TCP connection</li>
+<li>FIN segment:client or server (客户端或者服务器端)close the TCP connection</li>
+<li>RST段：接收端口号或源IP地址与任何正在进行的套接字不匹配的TCP段时。</li>
+</ul>
+</li>
+</ul>
+<h2 id="transport-layer-services"><a href="#transport-layer-services" class="headerlink" title="transport-layer services"></a>transport-layer services</h2><h3 id="services"><a href="#services" class="headerlink" title="services"></a>services</h3><ul>
+<li>提供app processes间的物理连接</li>
+<li>send side:将app层的messages，分成segments再传给network layer</li>
+<li>rcv side:重组segments为messages,传递给app layer</li>
+</ul>
+<h3 id="transport-vs-network-layer"><a href="#transport-vs-network-layer" class="headerlink" title="transport vs network layer"></a>transport vs network layer</h3><ul>
+<li><p>传输层</p>
+<ul>
+<li>逻辑连接建立在进程之间</li>
+<li>依赖，增强了 network layer的服务</li>
+</ul>
+</li>
+<li><p>网络层</p>
+<ul>
+<li>主机间的逻辑连接</li>
+<li>best-effort delievery</li>
+<li>无法保证报文传输的顺序和数据的完整性</li>
+<li>IP是一个不可靠服务</li>
+<li>由传输协议提供的服务通常受到底层网络层协议（延迟或带宽）的服务模型的约束，一些服务不包括在内，例如， 可靠的数据传输服务</li>
+</ul>
+</li>
+</ul>
+<h3 id="Protocols"><a href="#Protocols" class="headerlink" title="Protocols"></a>Protocols</h3><ul>
+<li><p>reliable, in-order TCP</p>
+<ul>
+<li>data delivery</li>
+<li>error checking</li>
+<li>flow control</li>
+<li>congestion control</li>
+<li>connection setup</li>
+</ul>
+</li>
+<li><p>unreliable,unordered UDP</p>
+<ul>
+<li>data delivery</li>
+<li>error checking</li>
+</ul>
+</li>
+<li><p>services not available</p>
+<ul>
+<li>delay guarantees</li>
+<li>bandwidth guarantees</li>
+</ul>
+</li>
+</ul>
+<h2 id="multiplexing-and-demutiplexing-多路复用与多路分解"><a href="#multiplexing-and-demutiplexing-多路复用与多路分解" class="headerlink" title="multiplexing and demutiplexing(多路复用与多路分解"></a>multiplexing and demutiplexing(多路复用与多路分解</h2><h3 id="multiplexing-at-sender：处理不同套接字的数据，增加transport-header-为了后面用于多路分解"><a href="#multiplexing-at-sender：处理不同套接字的数据，增加transport-header-为了后面用于多路分解" class="headerlink" title="multiplexing at sender：处理不同套接字的数据，增加transport header(为了后面用于多路分解"></a>multiplexing at sender：处理不同套接字的数据，增加transport header(为了后面用于多路分解</h3><h3 id="demultiplexing-at-receiver：-利用header-info将接收到的报文发送到正确的套接字中"><a href="#demultiplexing-at-receiver：-利用header-info将接收到的报文发送到正确的套接字中" class="headerlink" title="demultiplexing at receiver： 利用header info将接收到的报文发送到正确的套接字中"></a>demultiplexing at receiver： 利用header info将接收到的报文发送到正确的套接字中</h3><h3 id="多路分解中，主机利用IP地址和端口号将报文指向合适的套接字"><a href="#多路分解中，主机利用IP地址和端口号将报文指向合适的套接字" class="headerlink" title="多路分解中，主机利用IP地址和端口号将报文指向合适的套接字"></a>多路分解中，主机利用IP地址和端口号将报文指向合适的套接字</h3><h3 id="Port-number"><a href="#Port-number" class="headerlink" title="Port number"></a>Port number</h3><ul>
+<li>port number是一个16-bit的数字,from 0 to 65535</li>
+<li>0 to 1023 well-known port numbers</li>
+<li>1024 to 65535 dynamic and/or private ports</li>
+</ul>
+<h3 id="UDP-socket-identified"><a href="#UDP-socket-identified" class="headerlink" title="UDP socket identified:"></a>UDP socket identified:</h3><ul>
+<li>dest IP</li>
+<li>dest Port</li>
+</ul>
+<h3 id="TCP-socket-identified"><a href="#TCP-socket-identified" class="headerlink" title="TCP socket identified:"></a>TCP socket identified:</h3><ul>
+<li>dest IP</li>
+<li>dest Port</li>
+<li>source IP</li>
+<li>Source Port</li>
+</ul>
+<h3 id="今天的高性能Web服务器只使用一个进程，并为每个新客户端连接创建一个带有新连接套接字的新线程"><a href="#今天的高性能Web服务器只使用一个进程，并为每个新客户端连接创建一个带有新连接套接字的新线程" class="headerlink" title="今天的高性能Web服务器只使用一个进程，并为每个新客户端连接创建一个带有新连接套接字的新线程"></a>今天的高性能Web服务器只使用一个进程，并为每个新客户端连接创建一个带有新连接套接字的新线程</h3><h2 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h2><h3 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h3><ul>
+<li><p>best effort service</p>
+<ul>
+<li>lost</li>
+<li>delivered out-of-order to app</li>
+</ul>
+</li>
+<li><p>connectionless</p>
+<ul>
+<li>sender,receiver之间没有握手</li>
+<li>每个UDP报文都独立于其他</li>
+</ul>
+</li>
+<li><p>used in</p>
+<ul>
+<li>DNS</li>
+<li>RIP(Routing Information Protocol</li>
+<li>SNMP(Simple Network Management Protocol</li>
+<li>streaming multimedia apps(loss tolerant,rate sensitive</li>
+</ul>
+</li>
+<li><p>reliable transfer over UDP</p>
+<ul>
+<li>possible but a nontrivial(艰巨) task</li>
+<li>add reliability at application layer (adding acknowledgment and retransmission mechanisms)</li>
+<li>application-specific error recovery</li>
+</ul>
+</li>
+</ul>
+<h3 id="为何会有UDP的存在"><a href="#为何会有UDP的存在" class="headerlink" title="为何会有UDP的存在"></a>为何会有UDP的存在</h3><ul>
+<li>no congestion control：UDP速度快，很好的适用于real-time applications</li>
+<li>没有建立连接：减少延迟</li>
+<li>sender,receiver没有连接状态</li>
+<li><p>更小的header size</p>
+<ul>
+<li>TCP: typical 20 bytes</li>
+<li>UDP:8 bytes</li>
+</ul>
+</li>
+</ul>
+<h3 id="segment-header"><a href="#segment-header" class="headerlink" title="segment header"></a>segment header</h3><ul>
+<li>每个字段都是2 bytes</li>
+<li>source port</li>
+<li>dest port</li>
+<li>length(including header</li>
+<li>checksum</li>
+</ul>
+<h3 id="checksum"><a href="#checksum" class="headerlink" title="checksum"></a>checksum</h3><ul>
+<li>goal:检验是传输的报文中是否存在错误</li>
+<li><p>sender</p>
+<ul>
+<li>将包括头部字段的报文内容视为16-bit整数的序列</li>
+<li>先带循环进位累加所有序列</li>
+<li>累加结果再求反码</li>
+<li>checksum被放在udp的checksum field</li>
+</ul>
+</li>
+<li><p>receiver</p>
+<ul>
+<li>将所有的16-Bit加起来，包括checksum</li>
+<li>查看结果是否等于1111111111111111</li>
+</ul>
+</li>
+</ul>
+<h3 id="note"><a href="#note" class="headerlink" title="note"></a>note</h3><ul>
+<li>UDP并不会恢复错误</li>
+<li>Some implementations of UDP simply discard the damaged segment; others pass the damaged segment with a warning</li>
+</ul>
+<h2 id="Congestion-control的原理"><a href="#Congestion-control的原理" class="headerlink" title="Congestion control的原理"></a>Congestion control的原理</h2><h3 id="太多的数据源太快地发送太多数据，网络无法处理“"><a href="#太多的数据源太快地发送太多数据，网络无法处理“" class="headerlink" title="太多的数据源太快地发送太多数据，网络无法处理“"></a>太多的数据源太快地发送太多数据，网络无法处理“</h3><h3 id="与流量控制不同！（接收方控制发送方，因此发送方不会让接收方的缓冲区溢出）"><a href="#与流量控制不同！（接收方控制发送方，因此发送方不会让接收方的缓冲区溢出）" class="headerlink" title="与流量控制不同！（接收方控制发送方，因此发送方不会让接收方的缓冲区溢出）"></a>与流量控制不同！（接收方控制发送方，因此发送方不会让接收方的缓冲区溢出）</h3><h3 id="表现："><a href="#表现：" class="headerlink" title="表现："></a>表现：</h3><ul>
+<li>lost packets(buffer overflow at routers)</li>
+<li>long delay(queueing in router buffers)</li>
+</ul>
+<h3 id="拥塞控制两种常用的方法"><a href="#拥塞控制两种常用的方法" class="headerlink" title="拥塞控制两种常用的方法"></a>拥塞控制两种常用的方法</h3><ul>
+<li><p>端到端拥塞控制(end-end congestion control)</p>
+<ul>
+<li>没有网络中显示的反馈</li>
+<li>通过终端注意到的loss,delay来推测拥塞</li>
+<li>TCP可使用该方法</li>
+</ul>
+</li>
+<li><p>网络辅助的拥塞控制(network-assisted congestion control)</p>
+<ul>
+<li><p>路由器提供反馈给终端</p>
+<ul>
+<li>single bit indicating congestion (SNA, DECbit, TCP/IP ECN, ATM,XCP)</li>
+<li>router provides explicit rate information for sender to send (ATM ABR)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>ATM ABR congestion control</p>
+<ul>
+<li><p>特点</p>
+<ul>
+<li>ATM(Asynchronous Transfer Mode):异步传输网络，面向虚电路的方式处理包交换</li>
+<li>ABR: available bit rate</li>
+<li>elastic service 弹性服务</li>
+<li>如果发送者现在是轻负载(underloaded),那么发送者可以使用可用的带宽</li>
+<li>如果发送者发生了拥塞，那么发送者需要节流(throttled)仅维持所保障的最小速率</li>
+</ul>
+</li>
+<li><p>RM cells(资源管理信元)</p>
+<ul>
+<li>由发送方发送，夹杂着数据信元(data cells注意这不是包</li>
+<li>传输拥塞相关的信息</li>
+<li><p>提供直接网络反馈(direct network feedback)与经由接收方的网络反馈(feedback via receiver)</p>
+<ul>
+<li>前者是当交换器(不是路由器!)检测到了拥塞之后，就直接返回一个RM给发送方</li>
+<li>后者是当data cell经由接收方之后，检测data cell中如果存在拥塞信息，则接收方返回给发送方一个RM</li>
+</ul>
+</li>
+<li><p>RM内容信息</p>
+<ul>
+<li><p>bits in RM cell由路由器设置</p>
+<ul>
+<li>1 bit NI(no increase):no increase in rate(轻度拥塞)</li>
+<li>1 bit CI(congestion indication):严重拥塞</li>
+<li>RM cells从接收方返回时，CI/NI数据不变(因为这两个值由交换机设置</li>
+</ul>
+</li>
+<li><p>two-byte ER(explicit rate,显式速率)</p>
+<ul>
+<li>拥堵的交换机可能会减小cell中的ER值</li>
+<li>in RM cell</li>
+</ul>
+</li>
+<li><p>one-bit EFCI(显式转发拥塞指示)</p>
+<ul>
+<li>in data cell</li>
+<li>由拥堵的交换机设为1</li>
+<li>如果RM单元之前的数据单元设置了EFCI，则接收方在返回的RM单元中设置CI位</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="congestion-control"><a href="#congestion-control" class="headerlink" title="congestion control"></a>congestion control</h2><h3 id="TCP发送方如何限制流量进入连接的速率？-how-does-a-TCP-sender-limit-the-rate-at-which-it-sends-traffic-into-its-connection"><a href="#TCP发送方如何限制流量进入连接的速率？-how-does-a-TCP-sender-limit-the-rate-at-which-it-sends-traffic-into-its-connection" class="headerlink" title="TCP发送方如何限制流量进入连接的速率？(how does a TCP sender limit the rate at which it sends traffic into its connection?)"></a>TCP发送方如何限制流量进入连接的速率？(how does a TCP sender limit the rate at which it sends traffic into its connection?)</h3><ul>
+<li><p>拥塞窗口(cwnd)</p>
+<ul>
+<li>对于发送方在网络中发送流量的速率施加约束</li>
+<li>LastByteSent-LastByteAcked&lt;=min{cwnd,rwnd}</li>
+<li>假设receive buffer非常的大，所以rwnd就可以忽略了，方便分析拥塞机制LastByteSent-LastByteAcked&lt;=rwnd</li>
+<li>未确认的包的数量的限制间接地限制了sender的发送速率</li>
+<li>cwnd是动态的，感知网络拥塞的功能</li>
+</ul>
+</li>
+<li><p>TCP sending rate 如何计算</p>
+<ul>
+<li>考虑丢包和数据包传输延迟可以忽略</li>
+<li>初略的计算方法：发送方一次性发送cwnd bytes，等待ACK包一个RTT之后，发送更多的数据</li>
+<li>调整cwnd的大小来控制发送速率</li>
+<li>rate =cwnd/RTT bytes/sec(约等于)</li>
+</ul>
+</li>
+</ul>
+<h3 id="TCP发送方如何察觉自身与目的地之间的路径拥塞？-how-does-a-TCP-sender-perceive-that-there-is-congestion-on-the-path-between-itself-and-the-destination"><a href="#TCP发送方如何察觉自身与目的地之间的路径拥塞？-how-does-a-TCP-sender-perceive-that-there-is-congestion-on-the-path-between-itself-and-the-destination" class="headerlink" title="TCP发送方如何察觉自身与目的地之间的路径拥塞？(how does a TCP sender perceive that there is congestion on the path between itself and the destination?)"></a>TCP发送方如何察觉自身与目的地之间的路径拥塞？(how does a TCP sender perceive that there is congestion on the path between itself and the destination?)</h3><ul>
+<li><p>定义TCP sender丢包事件(loss event)</p>
+<ul>
+<li>出现了超时或者是有来自接收方三个冗余的ACKs</li>
+<li>loss event提供了拥塞指示</li>
+<li>acknowledgments触发（或计时）其拥塞窗口大小的增加</li>
+<li>TCP是自计时(self-clocking)的协议</li>
+</ul>
+</li>
+</ul>
+<h3 id="作为感知端到端拥塞的功能，发送方应使用什么算法来改变其发送速率？-what-algorithm-should-the-sender-use-to-change-its-send-rate-as-a-function-of-perceived-end-to-end-congestion"><a href="#作为感知端到端拥塞的功能，发送方应使用什么算法来改变其发送速率？-what-algorithm-should-the-sender-use-to-change-its-send-rate-as-a-function-of-perceived-end-to-end-congestion" class="headerlink" title="作为感知端到端拥塞的功能，发送方应使用什么算法来改变其发送速率？(what algorithm should the sender use to change its send rate as a function of perceived end-to-end congestion?)"></a>作为感知端到端拥塞的功能，发送方应使用什么算法来改变其发送速率？(what algorithm should the sender use to change its send rate as a function of perceived end-to-end congestion?)</h3><ul>
+<li><p>算法的三个主要组成部分</p>
+<ul>
+<li><p>slow start(慢启动)</p>
+<ul>
+<li>MSS(最大报文段长度)：传输层能够承载应用层的最大数据长度</li>
+<li>初始化cwnd=MSS,rate=MSS/RTT(约等于)</li>
+<li>如果可用的带宽远大于MSS/RTT，则通过每个RTT将cwnd增加1 MSS来缓慢探测带宽(效率低)</li>
+<li><p>slow start:当连接开始时，以指数方式（指数）增加速率直到第一个丢失事件发生</p>
+<ul>
+<li>一轮RTT，cwnd增加为原来的两倍</li>
+<li>发送方每收到一个ACK(第一轮有cwnd个ACK)，cwnd增加1个MSS，一轮增加1个cwnd</li>
+</ul>
+</li>
+<li><p>初始速度很慢，但是以指数方式快速上升</p>
+</li>
+<li><p>慢启动指数增长何时结束</p>
+<ul>
+<li><p>当丢包事件(loss event)是由超时事件(timeout event)指示的</p>
+<ul>
+<li>ssthresh=cwnd/2;(ssthresh is a state variable Threshold)</li>
+<li>cwnd set to 1 MSS</li>
+<li>回到慢启动状态</li>
+</ul>
+</li>
+<li><p>cwnd指数增长直到达到ssthresh,超过了(cwnd&gt;=ssthresh)之后就进入到拥塞避免状态(congestion avoidance state)</p>
+</li>
+<li><p>当丢包事件是由3个重复的ACK指示的</p>
+<ul>
+<li>ssthresh=cwnd/2</li>
+<li>cwnd=ssthresh+3.MSS</li>
+<li>快速重传并进入到快速恢复状态</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>congestion avoidance(拥塞避免)</p>
+<ul>
+<li>不是在每个RTT后将cwnd加倍，TCP采用了更加保守的方式：一轮RTT只增加一个MSS：发送方每收到一个ACK，cwnd增加1个MSS*(MSS/cwnd)</li>
+<li><p>拥塞避免什么时候停止线性增长？</p>
+<ul>
+<li><p>当丢包事件(loss event)是由超时事件(timeout event)指示的</p>
+<ul>
+<li>ssthresh=cwnd/2;(ssthresh is a state variable Threshold)</li>
+<li>cwnd set to 1 MSS</li>
+<li>回到慢启动状态</li>
+</ul>
+</li>
+<li><p>当丢包事件是由3个重复的ACK指示的</p>
+<ul>
+<li>ssthresh=cwnd/2</li>
+<li>cwnd=ssthresh+3.MSS</li>
+<li>快速重传并进入到快速恢复状态</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>fast recovery(快速恢复)</p>
+<ul>
+<li>对于导致TCP进入快速恢复状态的丢失段的每个重复ACK，cwnd的值增加1 MSS（cwnd = cwnd + MSS）每多余一个ACK就多一个MSS</li>
+<li>Fast recovery is a recommended, but not required</li>
+<li><p>为什么cwnd= ssthresh+3.MSS</p>
+<ul>
+<li>发送方收到三个冗余ACK，意味着有3个数据包离开网络抵达接收方缓存，即网络中减少了3个数据包，因此可以将拥塞窗口扩大。</li>
+</ul>
+</li>
+<li><p>当丢包事件(loss event)是由超时事件(timeout event)指示的</p>
+<ul>
+<li>ssthresh=cwnd/2;(ssthresh is a state variable Threshold)</li>
+<li>cwnd set to 1 MSS</li>
+<li>回到慢启动状态</li>
+</ul>
+</li>
+<li><p>new ACK event</p>
+<ul>
+<li>cwnd=sstresh</li>
+<li>进入拥塞避免状态</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 	

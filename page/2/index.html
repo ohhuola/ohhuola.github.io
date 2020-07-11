@@ -37,10 +37,10 @@
 
 	<article>
 	
-		<h1><a href="/2020/05/20/MVP/">论文笔记 Detecting Vulnerabilities using Patch-Enhanced Vulnerability Signatures</a></h1>
+		<h1><a href="/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/">论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2020-05-20</span><br>
+		<span class="article__date">2019-07-30</span><br>
 		
 			<span class="article__category">
 				<a class="article-category-link" href="/categories/Paper/">Paper</a>
@@ -52,49 +52,10 @@
 	
 
 	
-		<blockquote>
-<p>脆弱函数与修补后的函数之间可能存在很小的差异，而脆弱函数与待检测目标函数之间可能存在较大差异，这对基于克隆和基于函数匹配的方法识别这些重复出现的漏洞提出了挑战.</p>
-</blockquote>
-<h2 id="常见的漏洞检测方法"><a href="#常见的漏洞检测方法" class="headerlink" title="常见的漏洞检测方法"></a>常见的漏洞检测方法</h2><ul>
-<li><p>基于克隆：将漏洞检测问题等价为代码克隆检测问题。通过从已知漏洞中提取语法级别的签名来识别。</p>
-</li>
-<li><p>基于函数匹配：通过从已知漏洞中提取漏洞函数相关的签名来识别。</p>
-</li>
-</ul>
-<p>他们都没有考虑到漏洞是如何修复的，其实漏洞在打补丁前后的差别也是很微弱的。再者，那些从代码上差别很大的复用漏洞也没有办法用此类方法检测。</p>
-<h2 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h2><ol>
-<li><p>如何识别已经打过补丁的漏洞</p>
-</li>
-<li><p>对于已知漏洞，如何生成精确的签名</p>
-</li>
-</ol>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
-<li><p>对于第一个挑战</p>
-<ul>
-<li><p>生成vulnerability signature -&gt; how vulnerability is caused</p>
-</li>
-<li><p>生成patch signature -&gt; how vulnerability is fixed</p>
-</li>
-</ul>
-</li>
-<li><p>对于第二个挑战</p>
-<ul>
-<li>精确的提取只与漏洞和补丁相关的代码片段</li>
-</ul>
-</li>
-</ul>
-<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>分为三个模块</p>
-<ol>
-<li><p>提取函数签名，以目标系统代码为输入生成每个函数的签名</p>
-</li>
-<li><p>提取漏洞与补丁签名，以安全补丁为输入，生成漏洞签名与补丁签名</p>
-</li>
-<li><p>检测模块</p>
-</li>
-</ol>
-<h2 id="使用到的工具"><a href="#使用到的工具" class="headerlink" title="使用到的工具"></a>使用到的工具</h2><ul>
-<li>SourcererCC: <a href="https://arxiv.org/pdf/1512.06448.pdf" target="_blank" rel="noopener">https://arxiv.org/pdf/1512.06448.pdf</a></li>
-</ul>
+		<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于大量的警报与通用规则产生的高假阳性，安全分析员很难去评估攻击何时发生，怎样发生，在哪里发生。</p>
+<h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h2><p>这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。</p>
+<h2 id="2-设计实现"><a href="#2-设计实现" class="headerlink" title="2. 设计实现"></a>2. 设计实现</h2><p>如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型)</p>
+<p><figure class="figure"><img src="https://i.loli.net/2019/07/31/5d414fd85500b84999.png" alt="Fig.1 系统架构"><figcaption class="figure__caption">Fig.1 系统架构</figcaption></figure></p>
 
 	
 

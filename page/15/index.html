@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql0/">CTF中的SQL注入的思路总结</a></h1>
+		<h1><a href="/2019/03/16/sql8/">其他类型注入的详解(5)</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,52 +56,14 @@
 	
 
 	
-		<h4 id="1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑"><a href="#1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑" class="headerlink" title="1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):"></a>1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):</h4><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b979e5c0ee9b.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
-<p>尝试输入用户名(admin)和密码(随意)查看其返回结果这里一般又分为两种:</p>
-<ol>
-<li>有返回是密码错误还是用户名错误</li>
-<li>只是单一的返回登陆失败</li>
-</ol>
-<p><strong>对于第一种情况就可以直接尝试在<code>username</code>之后输入payload的了</strong></p>
-<ul>
-<li>判断注入点</li>
-<li>按照执行效果判断sql注入类型</li>
-<li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用regexp或length(),and或者异或,再或者就是直接输入)<blockquote>
-<p>payload <code>and length(&#39;关键字&#39;)&gt;0</code></p>
-<pre><code>`^length(&apos;关键字&apos;)&gt;0`
-</code></pre></blockquote>
-</li>
-<li>最后利用information_schema爆出库名,表名,字段名以及flag</li>
+		<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p>
+<h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul>
+<li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`
+</code></pre></li>
+<li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li>
 </ul>
-<p><strong>对于第二种情况就稍微要复杂一些了</strong></p>
-<ul>
-<li>可以用burp抓个包,查看一下数据包中是否存在着一些提示内容</li>
-<li>尝试一些万能的登陆密码:假设sql语句是:<br><code>select * from user where username=’$username’ and password=’$password’</code><br>而我们我发送的数据包中是 <code>username= &amp;password=</code>                            </li>
-</ul>
-<ol>
-<li><p><code>username=reborn&#39;=&#39;&amp;password=reborn&#39;=&#39;</code> =&gt; <code>select * from user where username=&#39;reborn&#39;=&#39; and password=&#39;reborn&#39;=&#39;</code>=&gt;<code>select * from user where 1 and 1</code></p>
-</li>
-<li><p><code>username=&#39; or 1=1 %23&amp;password=123456</code></p>
-</li>
-<li><p><code>username=admicsfn&#39; union select &#39;25d55ad283aa400af464c76d713c07ad&#39;%23&amp;password=12345678</code>利用不存在的用户再去构造一个密码来进行登陆</p>
-</li>
-</ol>
-<ul>
-<li>查看一下(利用字典)试一试哪一个特殊符号会报错之类的,如果有报错,则考虑报错注入</li>
-<li>如果报错的是一些不常见的字符串,那可能就涉及了某些漏洞,比如%报错,就可能是sprintf格式化字符串漏洞</li>
-<li>题外话:平时多浏览一些安全网站,去找新出现的漏洞,及时去做一些漏洞复现,与时俱进</li>
-</ul>
-<h4 id="2-题目是GET注入-大概率是回显注入"><a href="#2-题目是GET注入-大概率是回显注入" class="headerlink" title="2.题目是GET注入(大概率是回显注入)"></a>2.题目是GET注入(大概率是回显注入)</h4><ol>
-<li>判断注入点</li>
-<li>利用order by判断字段数</li>
-<li><code>union select 1,2,3,...%23</code>判断具体哪个字段存在回显</li>
-<li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用length(),and或者异或,再或者就是直接输入)</li>
-<li>最后利用information_schema爆出库名,表名,字段名以及flag</li>
-</ol>
-<ul>
-<li>如果回显的内容一直不存在变化那就需要考虑盲注了</li>
-</ul>
-<h4 id="3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注"><a href="#3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注" class="headerlink" title="3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)"></a>3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)</h4><p>可以使用<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1</code>或<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1&#39; %23</code>来判断sleep()能否执行    </p>
+<p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
+<h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>
 
 	
 

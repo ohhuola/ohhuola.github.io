@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql5/">其他类型注入的详解(4)</a></h1>
+		<h1><a href="/2019/03/16/sql2/">其他类型注入的详解(1)</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,25 +56,32 @@
 	
 
 	
-		<p>###4.sql约束攻击</p>
-<p>####知识点</p>
-<ol>
-<li>数据库字符串比较:在数据库对字符串进行比较时,如果两个字符的长度不一样,则会将较短的字符串末尾填充空格,使两个字符串的长度一致.</li>
-</ol>
-<p>比如这两条语句</p>
-<blockquote>
-<p><code>select * from admin where username=&#39;vampire&#39;</code><br><br>    <code>select *from admin where username=&#39;vampire  &#39;</code></p>
+		<h3 id="1-二次注入"><a href="#1-二次注入" class="headerlink" title="1.二次注入"></a>1.二次注入</h3><blockquote>
+<p>形成原理:在第一次进入数据库插入数据的时候,仅仅只是使用了addslashes或者是借助get_magic_quotes_gpc对其中的特殊字符进行转义,但是addslashes有一个特点就是虽然在参数前会添加’\’进行转义,但是’\’并不会进入数据库中,再写入数据库时还是保留了原来输入的数据.在下一次需要查询时就直接从数据库中取出了能够构成payload的语句.比如在第一次注入时写入了单引号,就可以形成二次注入。</p>
 </blockquote>
-<p>他们的查询结果是一致的.<br></p>
-<ol start="2">
-<li>INSERT截断: 这是数据库的另一个特性,当设计一字段时,我们都必须对其设定一个最大长度,比如CHAR(255),VARCHAR(20),但是当长度超过限制的时候,数据库就会将其截断,只保留限定的长度.<strong>(注意这里我们为什么需要insert注入:空格之后一定需要再跟一个或多个任意字符,防止程序在检查用户名是否已经存在时匹配到目标用户)</strong></li>
+<p><em>Tips:</em>一般题目中都会存在<strong>登陆注册</strong>两种功能(当然也不排除session文件包含)</p>
+<h4 id="例子-sqli-labs-less-24"><a href="#例子-sqli-labs-less-24" class="headerlink" title="例子:(sqli-labs less-24)"></a>例子:(sqli-labs less-24)</h4><ol>
+<li>首先进入搭建好的sqli-labs less-24</li>
+<li>注册一个新的账号<code>admin&#39;#</code></li>
 </ol>
-<p>####限制条件</p>
-<ol>
-<li>服务端没有对用户名长度进行限制.</li>
-<li>登陆验证的SQL语句没有和用户名和密码一起验证。如果是验证流程是先根据用户名查找出对应的密码，然后再比对密码的话，那么也不能进行利用。因为数据库一般取第一条则是目标用户的记录，那么你传输的密码肯定是和目标用户密码匹配不上的</li>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890e69b76.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
+<ol start="3">
+<li>查看此时数据库中已经多出一个账号了并且特殊符号没有被转义</li>
 </ol>
-<p>####实战:Bugku-login1<br><a href="http://123.206.31.85:49163/" target="_blank" rel="noopener">login1</a></p>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890e9a1eb.png" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
+<ol start="4">
+<li>我们尝试着登陆进去,会发现可以更改当前用户的密码</li>
+</ol>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890ea5883.png" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p>
+<ol start="5">
+<li>到数据库查看可以发现admin的密码被修改了,而admin’#的密码没有</li>
+</ol>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890ec53e5.png" alt="4.png"><figcaption class="figure__caption">4.png</figcaption></figure></p>
+<ol start="6">
+<li>我们可以查看pass_change.php的代码,发现修改密码这里的sql语句<br>“UPDATE users SET PASSWORD=’$pass’ where username=’$username’ and password=’$curr_pass’ “;<br><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b978dbab7453.png" alt="5.png"><figcaption class="figure__caption">5.png</figcaption></figure></li>
+</ol>
+<p>我们可以看到如果将<code>admin&#39;#</code>带到里面去后:<br><code>&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;# and password=&#39;$curr_pass&#39; &quot;;</code><br>实际上就是:<br><code>&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;</code><br>这里后面的内容都被#注释掉了,这样就是在修改admin的密码了,我们再尝试登陆一下,发现利用admin也可以成功了</p>
+<p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b9791c91357c.png" alt="6.png"><figcaption class="figure__caption">6.png</figcaption></figure></p>
 
 	
 
