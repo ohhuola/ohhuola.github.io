@@ -37,10 +37,10 @@
 
 	<article>
 	
-		<h1><a href="/2019/05/03/nachos1/">NachOS源码学习(一)：线程升级</a></h1>
+		<h1><a href="/2019/05/13/nachos3/">NachOS源码学习(三):内存管理</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-05-03</span><br>
+		<span class="article__date">2019-05-13</span><br>
 		
 			<span class="article__category">
 				<a class="article-category-link" href="/categories/OS/">OS</a>
@@ -56,21 +56,18 @@
 	
 
 	
-		<h2 id="NachOS简介"><a href="#NachOS简介" class="headerlink" title="NachOS简介"></a>NachOS简介</h2><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><blockquote>
-<p>Nachos的全称是“Not Another Completely Heuristic Operating System”，它是一个可修改和跟踪的操作系统教学软件。它给出了一个支持多线程和虚拟存储的操作系统骨架，可让学生在较短的时间内对操作系统中的基本原理和核心算法有一个全面和完整的了解。</p>
-</blockquote>
-<h4 id="NachOS工作机制"><a href="#NachOS工作机制" class="headerlink" title="NachOS工作机制"></a>NachOS工作机制</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc075bd7d08.jpg" alt="1.jpg"><figcaption class="figure__caption">1.jpg</figcaption></figure></p>
-<h4 id="NachOS源码的大体结构"><a href="#NachOS源码的大体结构" class="headerlink" title="NachOS源码的大体结构"></a>NachOS源码的大体结构</h4><p><figure class="figure"><img src="https://i.loli.net/2019/05/03/5ccc076093d5a.png" alt="2.jpg"><figcaption class="figure__caption">2.jpg</figcaption></figure></p>
-<h2 id="NachOS源码学习-线程模块"><a href="#NachOS源码学习-线程模块" class="headerlink" title="NachOS源码学习:线程模块"></a>NachOS源码学习:线程模块</h2><h4 id="理论部分"><a href="#理论部分" class="headerlink" title="理论部分:"></a>理论部分:</h4><p>Nachos 广泛采用线程的概念，是多线程操作系统。线程是Nachos处理机调度的单位，在Nachos中线程分成两类:</p>
-<ul>
-<li>系统线程。所谓<strong>系统线程是只运行核心代码的线程</strong>，它运行在核心态下，并且占用宿主机的资源，系统线程共享Nachos操作系统本身的正文段和数据段；<strong>一个系统线程完成一件独立的任务</strong>，比如在Nachos网络部分，有一个独立的线程一直监测有无发给自己的数据报。 </li>
-<li>用户线程。Nachos的另一类线程同Nachos中的用户进程有关。Nachos中用户进程由两部分组成，核心代码部分和用户程序部分。用户进程的进程控制块是线程控制块基础上的扩充。<strong>每当系统接收到生成用户进程的请求时，首先生成一个系统线程</strong>，进程控制块中有保存线程运行现场的空间，保证线程切换时现场不会丢失。<strong>该线程的作用是给用户程序分配虚拟机内存空间，并把用户程序的代码段和数据段装入用户地址空间，然后调用解释器解释执行用户程序</strong>；由于Nachos模拟的是一个单机环境，多个用户进程会竞争使用Nachos唯一的处理机资源，所以在<strong>Nachos用户进程的进程控制块中增加有虚拟机运行现场空间以及进程的地址空间指针等内容</strong>，保证用户进程在虚拟机上的正常运行。系统线程竞争使用宿主机的CPU资源，而用户进程的用户程序部分 竞争使用的是虚拟机的CPU和寄存器。</li>
+		<h3 id="阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制"><a href="#阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制" class="headerlink" title="阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制"></a>阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制</h3><h4 id="translate-h-cc"><a href="#translate-h-cc" class="headerlink" title="translate.h(cc)"></a>translate.h(cc)</h4><ul>
+<li>定义了TranslationEntry类，包括virtualPage,physicalPage以及一些标志位:valid,redonly等。</li>
+<li>标识了用户空间的第i个虚拟页应该映射到主存的第j个物理页，且当前这个物理页所处的状态。</li>
+<li><p>Translate()函数接收虚拟地址，物理地址，页尺寸，是否写入为参数。将虚拟地址转换为实际地址。</p>
+<h4 id="machine-h-cc"><a href="#machine-h-cc" class="headerlink" title="machine.h(cc)"></a>machine.h(cc)</h4></li>
+<li><p>定义了页尺寸,物理内存中的帧数,内存中容量,TLB的大小。</p>
+</li>
+<li>定义Machine类,用于模拟主机的硬件。</li>
+<li>Machine类中包含了一些重要的函数Run(),ReadRegister(),WriteRegister()</li>
+<li>遍历TLB数组，查找是否有对应的映射。</li>
+<li>如果有，TLB命中，直接进行物理地址转换；否则TLB miss,进入Exception处理。</li>
 </ul>
-<h4 id="NachOS线程管理的特点"><a href="#NachOS线程管理的特点" class="headerlink" title="NachOS线程管理的特点"></a>NachOS线程管理的特点</h4><ol>
-<li>线程个数没有限制。一般的操作系统，进程的数目是有限的，但是Nachos 中线程数目是无限的。线程的控制结构和系统线程的运行是占用宿主机的。能够开多少线程完全由宿主机条件限制，理论上是无限的。</li>
-<li>线程调度简单。启动了时钟中断的情况下，当时钟中断到来时。如果就绪线程队列中有就绪线程，就必须进行线程切换。没有启动时钟中断的情况下，Nachos使用非抢占式调度，即进程在运行过程中不会切换到其它进程运行，除非其主动放弃处理机或者运行结束。</li>
-<li>线程数据结构简单。Nachos中线程数据结构定义简单，没用户ID，线程ID，无法根据线程ID实现通信，同步互斥，也没有全局性的线程管理机制。</li>
-</ol>
 
 	
 

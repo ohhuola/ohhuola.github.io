@@ -37,7 +37,7 @@
 
 	<article>
 	
-		<h1><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></h1>
+		<h1><a href="/2019/03/16/sql1/">SQL注入学习总结(一):SQL注入的分类</a></h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-03-16</span><br>
@@ -56,19 +56,35 @@
 	
 
 	
-		<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote>
-<p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
+		<p>###1.按照执行效果分类</p>
+<ol>
+<li><p>基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii())</p>
+</li>
+<li><p>基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2)</p>
+</li>
+<li><p>基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark())</p>
+</li>
+<li><p>堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行</p>
+</li>
+<li><p>回显注入,一般是可以使用union的情况下进行注入</p>
+</li>
+</ol>
 <hr>
-<h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote>
-<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
-</blockquote>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
+<p>###2.按照注入点的类型来分类:</p>
+<ol>
+<li>数字型(select * from 表名 where id=x),一般的判断语句<br> <code>x and 1=1</code>页面正常运行,继续进行下一步(x已确认存在数据)<br> <code>x and 1=2</code>页面出错,说明该注入为数字型注入</li>
+<li>字符型(select * from 表名 where id=’x’),一般判断的语句:<br> <code>x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1</code>页面正常运行(#号也可能被过滤了导致不成功所以要多试)<br> <code>x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2</code>页面出错,说明该注入为字符型</li>
+<li>搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’)<br> <code>x%&#39; and &#39;1&#39;=&#39;1&#39;%23</code>页面正常运行<br> <code>x%&#39; and &#39;1&#39;=&#39;2&#39;%23</code>页面出错,说明为一个搜索型的sql注入<br>注:用or也可以进行判断的,不过他更多的用于绕过登录</li>
+</ol>
 <hr>
-<h4 id="CBC攻击"><a href="#CBC攻击" class="headerlink" title="CBC攻击"></a>CBC攻击</h4><p><strong>攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.<br>主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文</strong></p>
-<p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dd24bba15.jpg" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p>
-<h4 id="实际应用-Bugku-login4"><a href="#实际应用-Bugku-login4" class="headerlink" title="实际应用:Bugku-login4"></a>实际应用:Bugku-login4</h4><p><a href="http://123.206.31.85:49168/" target="_blank" rel="noopener">login4</a></p>
+<p>###3.按照数据提交的方式</p>
+<ol>
+<li>GET注入</li>
+<li>POST注入</li>
+<li>Cookie注入</li>
+<li>XFF等一些需要补充参数的HTTP头部注入</li>
+</ol>
+<hr>
 
 	
 
@@ -80,8 +96,8 @@
 
 
 
+	<span class="different-posts">📖 <a href="/page/20">more posts</a> 📖</span>
 
-	<span class="different-posts">📕 end of posts 📕</span>
 
 
 	</main>
