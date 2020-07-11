@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>其他类型注入的详解(5) | Security Learning</title>
+	<title>Security Learning</title>
 	<link rel="stylesheet" href="/css/style.css">
 	
       <link rel="alternate" href="/atom.xml" title="Security Learning" type="application/atom+xml">
@@ -29,44 +29,135 @@
 	</header>
 
 	<main>
-		<article>
-	
-		<h1>其他类型注入的详解(5)</h1>
-	
-	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br>
 		
-			<span class="article__category">
-				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
-			</span><br>
-		
-		
-			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
-			</span>
-		
-	</div>
 
-	
+<h1>Paper</h1>
 
-	
-		<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p>
-<h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul>
-<li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`
-</code></pre></li>
-<li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li>
+
+
+<ul class="archive">
+		<li class="archive__year archive__expendable archive__expendable_disabled">
+			<ul>
+			
+				
+					
+					
+						<li class="archive__entry"><a href="/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/">Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</a></li>
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+				
+					
+					
+
+				
+			
+			</ul>
+		</li>
 </ul>
-<p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
-<h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>
-
-	
-
-	
-		<span class="different-posts"><a href="/2019/03/16/sql8/" onclick="window.history.go(-1); return false;">⬅️ Go back </a></span>
-
-	
-
-</article>
 
 	</main>
 
