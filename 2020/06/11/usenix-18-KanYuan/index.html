@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>读书笔记:Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces | Security Learning</title>
+	<title>读书笔记 Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces | Security Learning</title>
 	<link rel="stylesheet" href="/css/style.css">
 	
       <link rel="alternate" href="/atom.xml" title="Security Learning" type="application/atom+xml">
@@ -31,7 +31,7 @@
 	<main>
 		<article>
 	
-		<h1>读书笔记:Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces</h1>
+		<h1>读书笔记 Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces</h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2020-06-11</span><br>
@@ -46,7 +46,7 @@
 	
 
 	
-		<h2 id="读书笔记-Reading-Thieves’-Cant-Automatically-Identifying-and-Understanding-Dark-Jargons-from-Cybercrime-Marketplaces"><a href="#读书笔记-Reading-Thieves’-Cant-Automatically-Identifying-and-Understanding-Dark-Jargons-from-Cybercrime-Marketplaces" class="headerlink" title="读书笔记 Reading Thieves’ Cant: Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces"></a>读书笔记 Reading Thieves’ Cant: Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces</h2><p>本文发表于 27th USENIX Security Symposium。针对地下论坛中黑色术语 (Dark Jargon) 的识别，理解提出相应的<a href="https://sites.google.com/view/cantreader" target="_blank" rel="noopener">解决方案</a>。第一作者 Kan Yuan 为印第安纳大学Bloomington分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。</p>
+		<p>本文发表于 27th USENIX Security Symposium。针对地下论坛中黑色术语 (Dark Jargon) 的识别，理解提出相应的<a href="https://sites.google.com/view/cantreader" target="_blank" rel="noopener">解决方案</a>。第一作者 Kan Yuan 为印第安纳大学Bloomington分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。</p>
 <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>黑色术语在地下论坛中通常应用于一些黑色交易，它们本来是在正常对话中出现的常用词，但在地下论坛中往往被赋予了其他意思。比如：”popcorn” 其本意是一种食物，但其在地下论坛中成为了 drug 的代名词。</p>
 <p>当前主要通过人工的手段来检测黑色术语，这样容易出错且效率低，无法赶上黑色术语更新换代的速度。</p>
 <h3 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h3><p>如图所示，本文提出了一种自动检测并理解黑色术语的技术 Cantreader。检测方法增强了现有的词嵌入模型来分析给定词汇在合法文档与地下论坛中词义上的区别，并通过二元分类器来识别这些黑色术语的上位词，试图理解它们真正的含义。</p>

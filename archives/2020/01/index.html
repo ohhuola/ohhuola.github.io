@@ -29,173 +29,44 @@
 	</header>
 
 	<main>
-		
+		<h1>Archive</h1>
 
-<h1>Web Security</h1>
+
 
 
 
 <ul class="archive">
-		<li class="archive__year archive__expendable archive__expendable_disabled">
+	
+	
+		<li class="archive__year archive__expendable ">
+			<span>2020</span>
 			<ul>
-			
 				
-					
-					
+					<li class="archive__month archive__expendable">
+						<span>January</span>
+						<ul>
+							
+								<li class="archive__entry"><a href="/2020/01/16/REST/">论文笔记 A thread embedding approach for identifying and classifying user-specified information in security forums</a></li>
+							
+						</ul>
+					</li>
 
 				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql0/">CTF中的SQL注入的思路总结</a></li>
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql1/">SQL注入学习总结(一):SQL注入的分类</a></li>
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql2/">其他类型注入的详解(1)</a></li>
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql3/">其他类型注入的详解(2)</a></li>
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></li>
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql5/">其他类型注入的详解(4)</a></li>
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql7/">SQL注入中的绕过</a></li>
-					
-
-				
-			
-				
-					
-					
-
-				
-			
-				
-					
-					
-						<li class="archive__entry"><a href="/2019/03/16/sql8/">其他类型注入的详解(5)</a></li>
-					
-
-				
-			
-				
-					
-					
-
-				
-			
 			</ul>
 		</li>
+		
+	
 </ul>
+
+<script>
+	const expandables = document.querySelectorAll('.archive__expendable')
+	for(let i = 0; i < expandables.length; i++) {
+		expandables[i].addEventListener('click', (e) => {
+			e.stopPropagation()
+			expandables[i].classList.toggle('archive__expendable_collapsed')
+		})
+	}
+</script>
 
 	</main>
 

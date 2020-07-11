@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts | Security Learning</title>
+	<title>论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts | Security Learning</title>
 	<link rel="stylesheet" href="/css/style.css">
 	
       <link rel="alternate" href="/atom.xml" title="Security Learning" type="application/atom+xml">
@@ -31,7 +31,7 @@
 	<main>
 		<article>
 	
-		<h1>Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</h1>
+		<h1>论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</h1>
 	
 	<div class="article__infos">
 		<span class="article__date">2019-07-30</span><br>
@@ -50,16 +50,7 @@
 <h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h2><p>这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。</p>
 <h2 id="2-设计实现"><a href="#2-设计实现" class="headerlink" title="2. 设计实现"></a>2. 设计实现</h2><p>如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型)</p>
 <p><figure class="figure"><img src="https://i.loli.net/2019/07/31/5d414fd85500b84999.png" alt="Fig.1 系统架构"><figcaption class="figure__caption">Fig.1 系统架构</figcaption></figure></p>
-<h3 id="2-1-数据处理"><a href="#2-1-数据处理" class="headerlink" title="2.1 数据处理"></a>2.1 数据处理</h3><ul>
-<li>将IDS警报处理成可观察量O，形为(time stamp, source IP, destination IP, category of attack, attack signature, source port, destination port and severity)的元组</li>
-<li>为了减少自动化脚本的影响，时间间隔在一秒之内的相同序列会被视为重复警报，直接去除</li>
-<li>为了更容易的理解元组o中的属性随时间的变化，作者将O表示为基于某些属性的时间序列</li>
-</ul>
-<h3 id="2-2-减少高频噪音"><a href="#2-2-减少高频噪音" class="headerlink" title="2.2 减少高频噪音"></a>2.2 减少高频噪音</h3><ul>
-<li>使用了一维离散高斯卷积滤波器来减少噪音</li>
-<li>其中\sigma可利用公式由\Delta得到</li>
-</ul>
-<h3 id="2-3-攻击序列生成"><a href="#2-3-攻击序列生成" class="headerlink" title="2.3 攻击序列生成"></a>2.3 攻击序列生成</h3><h3 id="2-4-攻击概率模型生成"><a href="#2-4-攻击概率模型生成" class="headerlink" title="2.4 攻击概率模型生成"></a>2.4 攻击概率模型生成</h3>
+
 	
 
 	
