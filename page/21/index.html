@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="theme-color" content="#33474d">
+	<title>Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css" />
+	
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+
+	<header class="header">
+		<nav class="header__nav">
+			
+				<a href="/archives" class="header__link">Archive</a>
+			
+				<a href="/categories" class="header__link">Categories</a>
+			
+				<a href="/about" class="header__link">About</a>
+			
+		</nav>
+		<h1 class="header__title"><a href="/">Security Learning</a></h1>
+		<h2 class="header__subtitle">on own time</h2>
+	</header>
+
+	<main>
+		
+	<span class="different-posts different-posts_earlier">📖 <a href="/page/20">earlier posts</a> 📖</span>
+
+
+
+
+	<article>
+	
+		<h1><a href="/2019/03/16/sql1/">SQL注入学习总结(一):SQL注入的分类</a></h1>
+	
+	<div class="article__infos">
+		<span class="article__date">2019-03-16</span><br />
+		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
+			</span><br />
+		
+		
+			<span class="article__tags">
+			  	<a class="article__tag-link" href="/tags/Sql/" rel="tag">Sql</a>
+			</span>
+		
+	</div>
+
+	
+
+	
+		<p>###1.按照执行效果分类</p>
+<ol>
+<li><p>基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii())</p>
+</li>
+<li><p>基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2)</p>
+</li>
+<li><p>基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark())</p>
+</li>
+<li><p>堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行</p>
+</li>
+<li><p>回显注入,一般是可以使用union的情况下进行注入</p>
+</li>
+</ol>
+<hr>
+<p>###2.按照注入点的类型来分类:</p>
+<ol>
+<li>数字型(select * from 表名 where id=x),一般的判断语句<br> <code>x and 1=1</code>页面正常运行,继续进行下一步(x已确认存在数据)<br> <code>x and 1=2</code>页面出错,说明该注入为数字型注入</li>
+<li>字符型(select * from 表名 where id=’x’),一般判断的语句:<br> <code>x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1</code>页面正常运行(#号也可能被过滤了导致不成功所以要多试)<br> <code>x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2</code>页面出错,说明该注入为字符型</li>
+<li>搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’)<br> <code>x%&#39; and &#39;1&#39;=&#39;1&#39;%23</code>页面正常运行<br> <code>x%&#39; and &#39;1&#39;=&#39;2&#39;%23</code>页面出错,说明为一个搜索型的sql注入<br>注:用or也可以进行判断的,不过他更多的用于绕过登录</li>
+</ol>
+<hr>
+<p>###3.按照数据提交的方式</p>
+<ol>
+<li>GET注入</li>
+<li>POST注入</li>
+<li>Cookie注入</li>
+<li>XFF等一些需要补充参数的HTTP头部注入</li>
+</ol>
+<hr>
+
+	
+
+	
+
+</article>
+
+
+
+
+
+	<span class="different-posts">📖 <a href="/page/22">more posts</a> 📖</span>
+
+
+
+	</main>
+
+	<footer class="footer">
+	<div class="footer-content">
+		
+	      <div class="footer__element">
+	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+</div>
+
+	    
+	      <div class="footer__element">
+	<h5>Check out</h5>
+	<ul class="footer-links">
+		<li class="footer-links__link"><a href="/archives">Archive</a></li>
+		
+		<li class="footer-links__link"><a href="/about">about page</a></li>
+		<li class="footer-links__link"><a href="/tags">Tags</a></li>
+		<li class="footer-links__link"><a href="/categories">Categories</a></li>
+	</ul>
+</div>
+
+	    
+
+		<div class="footer-credit">
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+		</div>
+
+	</div>
+
+
+</footer>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="theme-color" content="#33474d">
+	<title>Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css" />
+	
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+
+	<header class="header">
+		<nav class="header__nav">
+			
+				<a href="/archives" class="header__link">Archive</a>
+			
+				<a href="/categories" class="header__link">Categories</a>
+			
+				<a href="/about" class="header__link">About</a>
+			
+		</nav>
+		<h1 class="header__title"><a href="/">Security Learning</a></h1>
+		<h2 class="header__subtitle">on own time</h2>
+	</header>
+
+	<main>
+		
+	<span class="different-posts different-posts_earlier">📖 <a href="/page/10">earlier posts</a> 📖</span>
+
+
+
+
+	<article>
+	
+		<h1><a href="/2019/04/29/Internet/">自顶向下计算机网络知识笔记(一)</a></h1>
+	
+	<div class="article__infos">
+		<span class="article__date">2019-04-29</span><br />
+		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/Computer-Network/">Computer Network</a>
+			</span><br />
+		
+		
+			<span class="article__tags">
+			  	<a class="article__tag-link" href="/tags/Notebook/" rel="tag">Notebook</a>
+			</span>
+		
+	</div>
+
+	
+
+	
+		<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><h2 id="What’s-the-Internet"><a href="#What’s-the-Internet" class="headerlink" title="What’s the Internet?"></a>What’s the Internet?</h2><h3 id="computing-devices"><a href="#computing-devices" class="headerlink" title="computing devices"></a>computing devices</h3><ul>
+<li>hosts=end systems</li>
+</ul>
+<h3 id="commnication-links"><a href="#commnication-links" class="headerlink" title="commnication links"></a>commnication links</h3><ul>
+<li>Fiber</li>
+<li><p>transmission rate=bandwidth</p>
+<ul>
+<li>传输速率的单位是bits/seconds(bps</li>
+</ul>
+</li>
+</ul>
+<h3 id="packet-switch-device"><a href="#packet-switch-device" class="headerlink" title="packet switch(device)"></a>packet switch(device)</h3><ul>
+<li>routers</li>
+<li>link-layer switches</li>
+</ul>
+<h3 id="protocol"><a href="#protocol" class="headerlink" title="protocol"></a>protocol</h3><ul>
+<li>控制信息的传输和收发</li>
+</ul>
+<h3 id="service-view"><a href="#service-view" class="headerlink" title="service view"></a>service view</h3><ul>
+<li><p>commnuication infrastructure(基础设施</p>
+<ul>
+<li><p>提供给app的通信服务</p>
+<ul>
+<li>connection-oriented reliable service(TCP</li>
+<li>connectionless unreliable service(UDP</li>
+</ul>
+</li>
+<li><p>提供给apps的API</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Internet-vs-Intranet"><a href="#Internet-vs-Intranet" class="headerlink" title="Internet vs Intranet"></a>Internet vs Intranet</h3><ul>
+<li><p>Intranet（内联网，内网</p>
+<ul>
+<li>私人网络只允许组织内部的人员接入</li>
+</ul>
+</li>
+<li><p>difference</p>
+<ul>
+<li>local &amp; private</li>
+<li>Intranet is more secure and speed</li>
+</ul>
+</li>
+<li><p>same</p>
+<ul>
+<li>TCP/IP network protocol</li>
+<li>e-mail &amp; WWW standards</li>
+</ul>
+</li>
+</ul>
+<h2 id="network-edge"><a href="#network-edge" class="headerlink" title="network edge"></a>network edge</h2><h3 id="network-structure"><a href="#network-structure" class="headerlink" title="network structure"></a>network structure</h3><ul>
+<li><p>network edge</p>
+<ul>
+<li>客户端与服务器</li>
+<li>servers often in data centers(数据中心</li>
+</ul>
+</li>
+<li><p>access networks,physical media(接入网络，物理介质</p>
+</li>
+<li>network core</li>
+</ul>
+<h3 id="the-network-edge"><a href="#the-network-edge" class="headerlink" title="the network edge"></a>the network edge</h3><ul>
+<li>end system(主机</li>
+<li>client/server model</li>
+<li><p>peer-peer model(对等模型</p>
+<ul>
+<li>pptv,thunder,skype</li>
+</ul>
+</li>
+</ul>
+<h3 id="access-networks-and-physical-media"><a href="#access-networks-and-physical-media" class="headerlink" title="access networks and physical media"></a>access networks and physical media</h3><ul>
+<li><p>residential access nets(住宅接入网络</p>
+<ul>
+<li><p>DSL(数字用户线路</p>
+<ul>
+<li><p>数据以不同的传输速度传输</p>
+<ul>
+<li>0-4KHZ, phone</li>
+<li>4-50KHZ, upstream data</li>
+<li>50-1MHZ, downstream data</li>
+</ul>
+</li>
+<li><p>DSL Modem(调制解调器</p>
+<ul>
+<li>将数字信号调制到模拟载波信号上进行传输，并解调收到的模拟信号以得到数字信息的电子设备</li>
+</ul>
+</li>
+<li><p>splitter(分离器</p>
+<ul>
+<li>分离电话和数据信号，并将数据信号传送到DSL Modem</li>
+</ul>
+</li>
+<li><p>DSLAM(数字用户线路接入复用器</p>
+<ul>
+<li>将从不同住宅得到的模拟信号(analog signal)都转为数字信号(digital format)</li>
+<li>分离数据和电话信号，将数据发送到internet</li>
+</ul>
+</li>
+<li><p>一根DSL连线有三根分离的线</p>
+</li>
+<li>电话来电与因特网连接同时共享一根DSL线</li>
+</ul>
+</li>
+<li><p>Cable(有线电视电缆网络接入</p>
+<ul>
+<li>DSL使用的是现有的电话设施，Cable使用的是现有的有线电视设施</li>
+<li><p>HFC(混合光纤同轴电缆</p>
+<ul>
+<li>asymmetric(非对称）</li>
+</ul>
+</li>
+<li><p>子主题 4</p>
+</li>
+<li><p>frequency division multiplexing(频分多路复用</p>
+<ul>
+<li>不同的channels通过不同的频率frequency来传输</li>
+</ul>
+</li>
+<li><p>不同住宅是共享access network到cable headend, 而不像DSL不同住宅之间单独与central office相连</p>
+</li>
+</ul>
+</li>
+<li><p>fiber to the home(光纤入户</p>
+<ul>
+<li>光网络终端(ONT)，也叫作光猫，国内大多是路由器与光猫一体</li>
+<li>OLT提供了optical和electrical signals之间的转换</li>
+<li>splitter能够将一定数量住宅中的ONT汇集到一个共享光纤里去(from home to OLT</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>institutional access network(机构接入网络</p>
+<ul>
+<li>Ethernet(以太网</li>
+</ul>
+</li>
+<li><p>mobile access network(移动接入网络</p>
+<ul>
+<li>wireless LANs(无线局域网)</li>
+<li><p>wide-area wireless access(广域无线接入网)</p>
+<ul>
+<li>蜂窝电话</li>
+<li>3G,4G</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>physical media</p>
+<ul>
+<li><p>guided media</p>
+<ul>
+<li>solid media</li>
+</ul>
+</li>
+<li><p>unguided media</p>
+<ul>
+<li>空气，外太空，地面频道，卫星频道</li>
+</ul>
+</li>
+<li><p>twisted pair copper wire(双绞铜线</p>
+<ul>
+<li>缠绕是为了减少电子干扰</li>
+<li>传输速率可以取决于线的粗细程度和传输者与接收者之间的距离</li>
+<li><p>按屏蔽层分</p>
+<ul>
+<li>非屏蔽双绞线(UTP)</li>
+<li>屏蔽双绞线(STP)</li>
+</ul>
+</li>
+<li><p>最常用的以太网电缆：五类线，其最高传送速率为100Mbps，最大网段长100m（CAT5</p>
+</li>
+</ul>
+</li>
+<li><p>coaxial cable(同轴电缆)</p>
+</li>
+<li><p>fiber optic cable(光纤电缆)</p>
+<ul>
+<li>each plus a bit</li>
+</ul>
+</li>
+<li><p>terrestrial radio channels(地面无线电信道)</p>
+</li>
+<li>satellite radio channels(卫星无线电信道)</li>
+</ul>
+</li>
+</ul>
+<h2 id="Internet-structure"><a href="#Internet-structure" class="headerlink" title="Internet structure"></a>Internet structure</h2><h3 id="end-system-connect-to-Internet-via-access-ISPs"><a href="#end-system-connect-to-Internet-via-access-ISPs" class="headerlink" title="end system connect to Internet via access ISPs"></a>end system connect to Internet via access ISPs</h3><h3 id="Access-ISPs-in-turn-must-be-interconnected-互相连接"><a href="#Access-ISPs-in-turn-must-be-interconnected-互相连接" class="headerlink" title="Access ISPs in turn must be interconnected(互相连接"></a>Access ISPs in turn must be interconnected(互相连接</h3><h3 id="导致了网络结构的复杂"><a href="#导致了网络结构的复杂" class="headerlink" title="导致了网络结构的复杂"></a>导致了网络结构的复杂</h3><h3 id="由此产生了multiple-global-ISPs"><a href="#由此产生了multiple-global-ISPs" class="headerlink" title="由此产生了multiple global ISPs"></a>由此产生了multiple global ISPs</h3><h3 id="access-ISPs连接到regional-ISP-regional-ISP再连接到Tier-1-ISP-global-ISP"><a href="#access-ISPs连接到regional-ISP-regional-ISP再连接到Tier-1-ISP-global-ISP" class="headerlink" title="access ISPs连接到regional ISP, regional ISP再连接到Tier-1 ISP(global ISP)"></a>access ISPs连接到regional ISP, regional ISP再连接到Tier-1 ISP(global ISP)</h3><h3 id="content-provider-network-内容提供网络"><a href="#content-provider-network-内容提供网络" class="headerlink" title="content provider network(内容提供网络)"></a>content provider network(内容提供网络)</h3><ul>
+<li>运行他们自己的网络以提供服务</li>
+</ul>
+<h3 id="key-word"><a href="#key-word" class="headerlink" title="key word"></a>key word</h3><ul>
+<li><p>ISP</p>
+<ul>
+<li>互联网服务提供商</li>
+</ul>
+</li>
+<li><p>IXP</p>
+<ul>
+<li>互联网交换中心</li>
+</ul>
+</li>
+<li><p>peering link</p>
+<ul>
+<li>Global ISP之间也需要连接</li>
+</ul>
+</li>
+</ul>
+<h2 id="delay-loss-throughput-in-networks"><a href="#delay-loss-throughput-in-networks" class="headerlink" title="delay.loss.throughput in networks"></a>delay.loss.throughput in networks</h2><h3 id="loss-and-delay"><a href="#loss-and-delay" class="headerlink" title="loss and delay"></a>loss and delay</h3><ul>
+<li><p>how</p>
+<ul>
+<li>packet arrival rate to link exceeds output link capacity</li>
+<li>packets queue, wait for turn</li>
+</ul>
+</li>
+<li><p>four-types of packet delay</p>
+<ul>
+<li><p>nodal processing delay(节点处理时延,处理包需要的时间)</p>
+<ul>
+<li>check bit errors</li>
+<li>determine output link</li>
+<li>typically&lt; microseconds(微秒)</li>
+</ul>
+</li>
+<li><p>queueing delay(排队时延，排队等待传输)</p>
+<ul>
+<li>time waiting at output link for transmission</li>
+<li>depends on congestion level of router</li>
+<li>typically microseconds to milliseconds</li>
+</ul>
+</li>
+<li><p>transmission delay(传输时延)</p>
+<ul>
+<li>the amount of time required to transmit(push) all of the packet’s bits into the link</li>
+<li><p>d_trans=L/R</p>
+<ul>
+<li>L: packets length(bits)</li>
+<li>R:link bandwidth(bps)</li>
+<li>typically microseconds to milliseconds</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>propagation delay(传播时延)</p>
+<ul>
+<li>the time required to propagate from the beginning of link to next link to next router</li>
+<li><p>d_prop=d/s</p>
+<ul>
+<li>d:length of physical link</li>
+<li>s:speed</li>
+</ul>
+</li>
+<li><p>typically milliseconds</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>queueing delay</p>
+<ul>
+<li>R:transimission rate(bps)</li>
+<li>L:packet length(bits)</li>
+<li>a:average packet arrival rate(packets/s)</li>
+<li>traffic intensity(流量强度=La/R)</li>
+<li>La/R&gt;1, more work arriving than can be serviced, average delay infinite</li>
+</ul>
+</li>
+<li><p>packet loss</p>
+<ul>
+<li>queue in buffer has finite capacity</li>
+<li>packet arriving to full queue dropped</li>
+<li>lost packet may be retransmitted by previous node, by source end system, ot not at all</li>
+</ul>
+</li>
+<li><p>throughout</p>
+<ul>
+<li>rate(bits/time unit) at which bits transferred between sender and receiver(单位时间内多少Bit)</li>
+<li>instantaneous(瞬时的) throughput:rate at given point in time</li>
+<li>average throughput:rate over longer period of time</li>
+<li><p>bottleneck link</p>
+<ul>
+<li>link on end-end path that constrains end-end throughput</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="the-network-core-网络核心"><a href="#the-network-core-网络核心" class="headerlink" title="the network core(网络核心)"></a>the network core(网络核心)</h2><h3 id="circuit-switched-networks"><a href="#circuit-switched-networks" class="headerlink" title="circuit-switched networks"></a>circuit-switched networks</h3><ul>
+<li>资源是需分配，需要预留的</li>
+<li>常用于traditional telephone networks</li>
+<li>network must establish a connection between before send the information, the connection is called a circuit(电路)</li>
+<li>除了建立了电路之外，它还预留一个固定的transmission rate</li>
+<li>以约定好的transmission rate transfer data</li>
+<li>circuit segment idle if not used by call(dedicated resources no sharing)</li>
+<li><p>two ways</p>
+<ul>
+<li><p>FDM(频分多路复用)</p>
+<ul>
+<li>the link dedicates a frequency band(频段) to each connection for the duration of the connection</li>
+<li>the width of the band is called bandwidth(带宽)</li>
+<li>each circuit continuously gets a fraction of the bandwidth</li>
+</ul>
+</li>
+<li><p>TDM(时分多路复用)</p>
+<ul>
+<li>time is divided into frames(帧) of fixed duration, and each frame is divided in to a fixed number of time slots(时间片)</li>
+<li>network dedicates one time slot(circuit) in every frame to this connection, 时间片用于传输数据</li>
+<li>每个电路在短暂的时间间隔内定期获得所有的带宽</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="packet-switched-networks"><a href="#packet-switched-networks" class="headerlink" title="packet-switched networks"></a>packet-switched networks</h3><ul>
+<li>资源不需要预留，按需使用(use on demand)</li>
+<li>hosts将应用层的信息变成packets(分组/数据包)</li>
+<li>每一个包都是以最大链路容量传输的</li>
+<li><p>hosts sending function</p>
+<ul>
+<li>send packets of data(发送数据包)</li>
+<li>将message分成一堆长度为L bit 的数据包</li>
+<li>以R的传输速率将包传输到可访问的网络</li>
+<li>transmission delay:L(bits)/R(bits/sec)</li>
+</ul>
+</li>
+<li><p>store and forward</p>
+<ul>
+<li>router buffer store the received packet’s bits, wait for all of them, then begin to transmit(forward) to outbound link</li>
+<li>所有的包必须在路由器处等待直到包数据完整才能被传输至下一个链路</li>
+<li><p>end-to-end delay</p>
+<ul>
+<li>NL/R</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>queueing delay</p>
+<ul>
+<li><p>each packet switch has multiple links, each link has an output buffer</p>
+<ul>
+<li>store packets that router is about to send into that link</li>
+</ul>
+</li>
+<li><p>arriving packet must wait in output buffer, finds link busy</p>
+</li>
+<li><p>queuing delays(排队延迟)</p>
+<ul>
+<li><p>variable and depend on level of congestion in  network</p>
+<ul>
+<li>buffer space is finite and may be completely full</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>packet loss(丢包)</p>
+<ul>
+<li>it will occur when buffer is completely full, either the arriving packet or one of the already-queued packets will be dropped,.</li>
+</ul>
+</li>
+<li><p>If arrival rate to link exceeds transmission rate of link for a period of time</p>
+<ul>
+<li>packets will queue, wait to be transmitted on link</li>
+<li>congestion will occur at the router, as packets queue in the link’s output buffer before being transmitted onto the link</li>
+<li>packets can be dropped if memory fills up</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>two key function</p>
+<ul>
+<li>routing:determines source-destination route taken by packets</li>
+<li>forwarding: move packets from router’s input to appropriate router output</li>
+</ul>
+</li>
+</ul>
+<h3 id="vs"><a href="#vs" class="headerlink" title="vs"></a>vs</h3><ul>
+<li><p>circuit better</p>
+<ul>
+<li>packet switch不适用于实时服务，因为它的variable and unpredictable end-to-end delays</li>
+</ul>
+</li>
+<li><p>packet better</p>
+<ul>
+<li>更好的分享transmission capacity</li>
+<li>simpler, more efficient, and less costly</li>
+<li>more efficient是因为packet switch允许更多的用户使用network,并且在用户数量较少时performance差不多</li>
+</ul>
+</li>
+</ul>
+<h3 id="packet-switch的优缺点"><a href="#packet-switch的优缺点" class="headerlink" title="packet switch的优缺点"></a>packet switch的优缺点</h3><ul>
+<li>greater for burst data(突发数据)</li>
+<li><p>excessive congestion possible</p>
+<ul>
+<li>packet delay and loss</li>
+<li>protocols needed for reliable data transfer, congestion control</li>
+</ul>
+</li>
+</ul>
+<h3 id="什么时候使用circuit"><a href="#什么时候使用circuit" class="headerlink" title="什么时候使用circuit"></a>什么时候使用circuit</h3><ul>
+<li>bandwidth需要得到保障的时候比如audio/video app</li>
+</ul>
+
+	
+
+	
+
+</article>
+
+
+
+
+
+	<span class="different-posts">📖 <a href="/page/12">more posts</a> 📖</span>
+
+
+
+	</main>
+
+	<footer class="footer">
+	<div class="footer-content">
+		
+	      <div class="footer__element">
+	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+</div>
+
+	    
+	      <div class="footer__element">
+	<h5>Check out</h5>
+	<ul class="footer-links">
+		<li class="footer-links__link"><a href="/archives">Archive</a></li>
+		
+		<li class="footer-links__link"><a href="/about">about page</a></li>
+		<li class="footer-links__link"><a href="/tags">Tags</a></li>
+		<li class="footer-links__link"><a href="/categories">Categories</a></li>
+	</ul>
+</div>
+
+	    
+
+		<div class="footer-credit">
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+		</div>
+
+	</div>
+
+
+</footer>
+
+
+
+</body>
+
+</html>

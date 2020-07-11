@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="theme-color" content="#33474d">
+	<title>Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css" />
+	
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+
+	<header class="header">
+		<nav class="header__nav">
+			
+				<a href="/archives" class="header__link">Archive</a>
+			
+				<a href="/categories" class="header__link">Categories</a>
+			
+				<a href="/about" class="header__link">About</a>
+			
+		</nav>
+		<h1 class="header__title"><a href="/">Security Learning</a></h1>
+		<h2 class="header__subtitle">on own time</h2>
+	</header>
+
+	<main>
+		
+	<span class="different-posts different-posts_earlier">📖 <a href="/">earlier posts</a> 📖</span>
+
+
+
+
+	<article>
+	
+		<h1><a href="/2020/05/20/MVP/">(USENIX)论文笔记 Detecting Vulnerabilities using Patch-Enhanced Vulnerability Signatures</a></h1>
+	
+	<div class="article__infos">
+		<span class="article__date">2020-05-20</span><br />
+		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/Paper/">Paper</a>
+			</span><br />
+		
+		
+	</div>
+
+	
+
+	
+		<blockquote>
+<p>脆弱函数与修补后的函数之间可能存在很小的差异，而脆弱函数与待检测目标函数之间可能存在较大差异，这对基于克隆和基于函数匹配的方法识别这些重复出现的漏洞提出了挑战.</p>
+</blockquote>
+<h2 id="常见的漏洞检测方法"><a href="#常见的漏洞检测方法" class="headerlink" title="常见的漏洞检测方法"></a>常见的漏洞检测方法</h2><ul>
+<li><p>基于克隆：将漏洞检测问题等价为代码克隆检测问题。通过从已知漏洞中提取语法级别的签名来识别。</p>
+</li>
+<li><p>基于函数匹配：通过从已知漏洞中提取漏洞函数相关的签名来识别。</p>
+</li>
+</ul>
+<p>他们都没有考虑到漏洞是如何修复的，其实漏洞在打补丁前后的差别也是很微弱的。再者，那些从代码上差别很大的复用漏洞也没有办法用此类方法检测。</p>
+<h2 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h2><ol>
+<li><p>如何识别已经打过补丁的漏洞</p>
+</li>
+<li><p>对于已知漏洞，如何生成精确的签名</p>
+</li>
+</ol>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul>
+<li><p>对于第一个挑战</p>
+<ul>
+<li><p>生成vulnerability signature -&gt; how vulnerability is caused</p>
+</li>
+<li><p>生成patch signature -&gt; how vulnerability is fixed</p>
+</li>
+</ul>
+</li>
+<li><p>对于第二个挑战</p>
+<ul>
+<li>精确的提取只与漏洞和补丁相关的代码片段</li>
+</ul>
+</li>
+</ul>
+<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>分为三个模块</p>
+<ol>
+<li><p>提取函数签名，以目标系统代码为输入生成每个函数的签名</p>
+</li>
+<li><p>提取漏洞与补丁签名，以安全补丁为输入，生成漏洞签名与补丁签名</p>
+</li>
+<li><p>检测模块</p>
+</li>
+</ol>
+<h2 id="使用到的工具"><a href="#使用到的工具" class="headerlink" title="使用到的工具"></a>使用到的工具</h2><ul>
+<li>SourcererCC: <a href="https://arxiv.org/pdf/1512.06448.pdf" target="_blank" rel="noopener">https://arxiv.org/pdf/1512.06448.pdf</a></li>
+</ul>
+
+	
+
+	
+
+</article>
+
+
+
+
+
+	<span class="different-posts">📖 <a href="/page/3">more posts</a> 📖</span>
+
+
+
+	</main>
+
+	<footer class="footer">
+	<div class="footer-content">
+		
+	      <div class="footer__element">
+	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+</div>
+
+	    
+	      <div class="footer__element">
+	<h5>Check out</h5>
+	<ul class="footer-links">
+		<li class="footer-links__link"><a href="/archives">Archive</a></li>
+		
+		<li class="footer-links__link"><a href="/about">about page</a></li>
+		<li class="footer-links__link"><a href="/tags">Tags</a></li>
+		<li class="footer-links__link"><a href="/categories">Categories</a></li>
+	</ul>
+</div>
+
+	    
+
+		<div class="footer-credit">
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+		</div>
+
+	</div>
+
+
+</footer>
+
+
+
+</body>
+
+</html>

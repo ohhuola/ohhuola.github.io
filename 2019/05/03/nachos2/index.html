@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="theme-color" content="#33474d">
+	<title>NachOS源码学习(二)：同步机制 | Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css" />
+	
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+
+	<header class="header">
+		<nav class="header__nav">
+			
+				<a href="/archives" class="header__link">Archive</a>
+			
+				<a href="/categories" class="header__link">Categories</a>
+			
+				<a href="/about" class="header__link">About</a>
+			
+		</nav>
+		<h1 class="header__title"><a href="/">Security Learning</a></h1>
+		<h2 class="header__subtitle">on own time</h2>
+	</header>
+
+	<main>
+		<article>
+	
+		<h1>NachOS源码学习(二)：同步机制</h1>
+	
+	<div class="article__infos">
+		<span class="article__date">2019-05-03</span><br />
+		
+			<span class="article__category">
+				<a class="article-category-link" href="/categories/OS/">OS</a>
+			</span><br />
+		
+		
+			<span class="article__tags">
+			  	<a class="article__tag-link" href="/tags/NachOS/" rel="tag">NachOS</a>
+			</span>
+		
+	</div>
+
+	
+
+	
+		<h2 id="源码部分Synch-cc-h"><a href="#源码部分Synch-cc-h" class="headerlink" title="源码部分Synch.cc(h)"></a>源码部分Synch.cc(h)</h2><p>synch.cc(h)中一个有三个类Semaphore,Lock,Condition：</p>
+<ol>
+<li>Semaphore，能够通过一个名字和一个值来初始化一个信号量。<ul>
+<li>P函数的作用类似于<code>sem_wait()</code>，它判断当前线程能否使用临界资源，若不能则将当前线程放入等待队列(value&gt;0),若能(value&gt;0)则将值减一，进入临界区。</li>
+<li>V函数的作用类似于<code>sem_pos()</code>,当等待队列不为空时，则取出等待队列队首的线程并将其标注为ReadyToRun,使该线程进入就绪状态，并且初始值加1。</li>
+</ul>
+</li>
+<li>Lock,没有具体的实现，只有基本结构。可以看到它可以用二元信号量来实现。<ul>
+<li>Aquire()函数就相当于Semphore中的P操作。</li>
+<li>Remove()函数相当于Semaphore中的V操作。</li>
+</ul>
+</li>
+<li>Condition,与信号量和锁机制不一样，它是没有值的。当一个线程需要的某种条件没有得到满足时，可以将自己作为一个等待条件变量的线程插入所有等待该条件变量的队列，只要条件一旦得到满足，该线程就会被唤醒继续运行。条件变量总是和锁机制一起使。它的基本方法有Wait、Signal以及BroadCast。所有这些操作必须在当前线程获得一个锁的前提下，而且所有对一个条件变量进行的操作必须建立在同一个锁的前提下。<ul>
+<li>Wait(Lock *conditionLock) 线程等待条件变量。条件变量的实现Wait()，先关闭中断，将锁释放，然后将当前线程加入等待条件变量的队列，当前线程睡眠。如果被唤醒，需要重新获得锁。</li>
+<li>Signal(Lock *conditionLock) 从条件变量的等待队列中唤醒一个等待该条件变量的线程。Signal()操作，如果等待队列非空，则将队列中的一个线程唤醒，加入线程就绪队列。</li>
+<li>BroadCast(Lock *conditionLock) 唤醒所有等待该条件变量的线程。<h2 id="源码部分Synchlist-cc-h"><a href="#源码部分Synchlist-cc-h" class="headerlink" title="源码部分Synchlist.cc(h)"></a>源码部分Synchlist.cc(h)</h2></li>
+</ul>
+</li>
+</ol>
+<p>synchlist.cc(h)中只有一个类，实现了对队列的互斥访问。Append()函数用于添加一个线程到队尾。Remove()函数用于将队首的线程移出队列。用Lock锁实现了Append()函数与Remove()函数对队列的互斥访问，两者之间不能同时被CPU运行。</p>
+
+	
+
+	
+		<span class="different-posts"><a href="/2019/05/03/nachos2/" onclick="window.history.go(-1); return false;">⬅️ Go back </a></span>
+
+	
+
+</article>
+
+	</main>
+
+	<footer class="footer">
+	<div class="footer-content">
+		
+	      <div class="footer__element">
+	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+</div>
+
+	    
+	      <div class="footer__element">
+	<h5>Check out</h5>
+	<ul class="footer-links">
+		<li class="footer-links__link"><a href="/archives">Archive</a></li>
+		
+		<li class="footer-links__link"><a href="/about">about page</a></li>
+		<li class="footer-links__link"><a href="/tags">Tags</a></li>
+		<li class="footer-links__link"><a href="/categories">Categories</a></li>
+	</ul>
+</div>
+
+	    
+
+		<div class="footer-credit">
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+		</div>
+
+	</div>
+
+
+</footer>
+
+
+
+</body>
+
+</html>
