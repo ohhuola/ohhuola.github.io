@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+<head><meta name="generator" content="Hexo 3.8.0">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>Security Learning</title>
-	<link rel="stylesheet" href="/css/style.css" />
+	<title>其他类型注入的详解(4) | Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css">
 	
-<meta name="generator" content="Hexo 4.2.1"></head>
+</head>
 
 <body>
 
@@ -27,26 +27,20 @@
 	</header>
 
 	<main>
-		
-	<span class="different-posts different-posts_earlier">📖 <a href="/page/18">earlier posts</a> 📖</span>
-
-
-
-
-	<article>
+		<article>
 	
-		<h1><a href="/2019/03/16/sql5/">其他类型注入的详解(4)</a></h1>
+		<h1>其他类型注入的详解(4)</h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br />
+		<span class="article__date">2019-03-16</span><br>
 		
 			<span class="article__category">
 				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
-			</span><br />
+			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/" rel="tag">Sql</a>
+			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
 			</span>
 		
 	</div>
@@ -61,9 +55,9 @@
 </ol>
 <p>比如这两条语句</p>
 <blockquote>
-<p><code>select * from admin where username=&#39;vampire&#39;</code></br><br>    <code>select *from admin where username=&#39;vampire  &#39;</code></p>
+<p><code>select * from admin where username=&#39;vampire&#39;</code><br><br>    <code>select *from admin where username=&#39;vampire  &#39;</code></p>
 </blockquote>
-<p>他们的查询结果是一致的.</br></p>
+<p>他们的查询结果是一致的.<br></p>
 <ol start="2">
 <li>INSERT截断: 这是数据库的另一个特性,当设计一字段时,我们都必须对其设定一个最大长度,比如CHAR(255),VARCHAR(20),但是当长度超过限制的时候,数据库就会将其截断,只保留限定的长度.<strong>(注意这里我们为什么需要insert注入:空格之后一定需要再跟一个或多个任意字符,防止程序在检查用户名是否已经存在时匹配到目标用户)</strong></li>
 </ol>
@@ -77,16 +71,11 @@
 	
 
 	
+		<span class="different-posts"><a href="/2019/03/16/sql5/" onclick="window.history.go(-1); return false;">⬅️ Go back </a></span>
+
+	
 
 </article>
-
-
-
-
-
-	<span class="different-posts">📖 <a href="/page/20">more posts</a> 📖</span>
-
-
 
 	</main>
 
@@ -94,7 +83,7 @@
 	<div class="footer-content">
 		
 	      <div class="footer__element">
-	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+	<p>Hi there, <br>welcome to my Blog glad you found it. Have a look around, will you?</p>
 </div>
 
 	    
@@ -112,7 +101,7 @@
 	    
 
 		<div class="footer-credit">
-			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo">MeiliDu</a></span>
 		</div>
 
 	</div>

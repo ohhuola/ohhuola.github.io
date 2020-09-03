@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+<head><meta name="generator" content="Hexo 3.8.0">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
-	<title>Security Learning</title>
-	<link rel="stylesheet" href="/css/style.css" />
+	<title>CBC翻转字节攻击 | Security Learning</title>
+	<link rel="stylesheet" href="/css/style.css">
 	
-<meta name="generator" content="Hexo 4.2.1"></head>
+</head>
 
 <body>
 
@@ -27,26 +27,20 @@
 	</header>
 
 	<main>
-		
-	<span class="different-posts different-posts_earlier">📖 <a href="/page/22">earlier posts</a> 📖</span>
-
-
-
-
-	<article>
+		<article>
 	
-		<h1><a href="/2019/03/16/sql4/">CBC翻转字节攻击</a></h1>
+		<h1>CBC翻转字节攻击</h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br />
+		<span class="article__date">2019-03-16</span><br>
 		
 			<span class="article__category">
 				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
-			</span><br />
+			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/" rel="tag">Sql</a>
+			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
 			</span>
 		
 	</div>
@@ -55,12 +49,12 @@
 
 	
 		<h4 id="知识点-AES的CBC模式加密"><a href="#知识点-AES的CBC模式加密" class="headerlink" title="知识点:AES的CBC模式加密"></a>知识点:AES的CBC模式加密</h4><h5 id="加密过程"><a href="#加密过程" class="headerlink" title="加密过程:"></a>加密过程:</h5><blockquote>
-<p>IV:用于随机化加密的字符串</br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块</br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
+<p>IV:用于随机化加密的字符串<br><br>            ciphertext_0=Encrypt(Plaintext XOR IV)只用于第一组块<br><br>            ciphertext_n=Encrypt(Plaintext XOR Ciphertext_N-1)用于除第一组之外的模块</p>
 </blockquote>
 <p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c44de5.jpg" alt="1.png"><figcaption class="figure__caption">1.png</figcaption></figure></p>
 <hr>
 <h5 id="解密过程"><a href="#解密过程" class="headerlink" title="解密过程:"></a>解密过程:</h5><blockquote>
-<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块</br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
+<p>plaintext_0=Decrpt(Ciphertext) XOR IV 只用于第一组块<br><br>    plaintext_n=Decrpt(Ciphertext) XOR Ciphertext_n-1</p>
 </blockquote>
 <p><figure class="figure"><img src="https://i.loli.net/2018/09/12/5b98dc5c63805.jpg" alt="2.png"><figcaption class="figure__caption">2.png</figcaption></figure></p>
 <hr>
@@ -71,16 +65,11 @@
 	
 
 	
+		<span class="different-posts"><a href="/2019/03/16/sql4/" onclick="window.history.go(-1); return false;">⬅️ Go back </a></span>
+
+	
 
 </article>
-
-
-
-
-
-
-	<span class="different-posts">📕 end of posts 📕</span>
-
 
 	</main>
 
@@ -88,7 +77,7 @@
 	<div class="footer-content">
 		
 	      <div class="footer__element">
-	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+	<p>Hi there, <br>welcome to my Blog glad you found it. Have a look around, will you?</p>
 </div>
 
 	    
@@ -106,7 +95,7 @@
 	    
 
 		<div class="footer-credit">
-			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo">MeiliDu</a></span>
 		</div>
 
 	</div>

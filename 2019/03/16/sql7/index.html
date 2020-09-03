@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-<head><meta name="generator" content="Hexo 3.8.0">
+<head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
 	<title>SQL注入中的绕过 | Security Learning</title>
-	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="/css/style.css" />
 	
-</head>
+<meta name="generator" content="Hexo 4.2.1"></head>
 
 <body>
 
@@ -32,15 +32,15 @@
 		<h1>SQL注入中的绕过</h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-03-16</span><br>
+		<span class="article__date">2019-03-16</span><br />
 		
 			<span class="article__category">
 				<a class="article-category-link" href="/categories/Web-Security/">Web Security</a>
-			</span><br>
+			</span><br />
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/Sql/">Sql</a>
+			  	<a class="article__tag-link" href="/tags/Sql/" rel="tag">Sql</a>
 			</span>
 		
 	</div>
@@ -60,13 +60,13 @@
 <hr>
 <p>###二.对特殊字符的绕过</p>
 <ul>
-<li><p>对空格的绕过:<br></p>
+<li><p>对空格的绕过:</br></p>
 <pre>两个空格代替一个,用tab键代替空格
 `/**/ %20 %09 %0a` 
 利用空格绕过:很多关键字都可以写成带括号的形式select(),or()
 特殊函数中的空格绕过:ascii(mid(xxfrom(1))) ascii(substr(xxfrom(1)))</pre>
 </li>
-<li><p>对单引号的绕过:<br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code><br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code><br></p>
+<li><p>对单引号的绕过:</br><br><code>宽字节 %bf%27 %df%27 %aa%27(争对字符集为GBK时使用</code></br><br><code>十六进制绕过(针对需要输入表名的时候 &#39;user&#39;=&gt;0x7573657273)</code></br></p>
 </li>
 <li><p>对逗号的绕过:</p>
   <pre>
@@ -105,7 +105,7 @@
                   右括号=> %u0029 %uff09
 </pre>    
 </li>
-<li><p>相同字符的绕过:<br><br>题目中有是可能会出现一种情况:</p>
+<li><p>相同字符的绕过:</br><br>题目中有是可能会出现一种情况:</p>
 <blockquote>
 <p>它不允许出现某个字符串,但是在数据库中又确实存在这个字符串,再加之mysql与php的编码字符集不相同,便可以利用相似的字符将其绕过</p>
 </blockquote>
@@ -129,7 +129,7 @@
 	<div class="footer-content">
 		
 	      <div class="footer__element">
-	<p>Hi there, <br>welcome to my Blog glad you found it. Have a look around, will you?</p>
+	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
 </div>
 
 	    
@@ -147,7 +147,7 @@
 	    
 
 		<div class="footer-credit">
-			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo">MeiliDu</a></span>
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
 		</div>
 
 	</div>
