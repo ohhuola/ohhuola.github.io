@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+<head><meta name="generator" content="Hexo 3.8.0">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="theme-color" content="#33474d">
 	<title>Security Learning</title>
-	<link rel="stylesheet" href="/css/style.css" />
+	<link rel="stylesheet" href="/css/style.css">
 	
-<meta name="generator" content="Hexo 4.2.1"></head>
+</head>
 
 <body>
 
@@ -35,18 +35,18 @@
 
 	<article>
 	
-		<h1><a href="/2019/05/13/nachos3/">NachOS源码学习(三):内存管理</a></h1>
+		<h1><a href="/2019/04/08/bug-compatibility/">两个常见的python2与python3的兼容问题</a></h1>
 	
 	<div class="article__infos">
-		<span class="article__date">2019-05-13</span><br />
+		<span class="article__date">2019-04-08</span><br>
 		
 			<span class="article__category">
-				<a class="article-category-link" href="/categories/OS/">OS</a>
-			</span><br />
+				<a class="article-category-link" href="/categories/Bugs/">Bugs</a>
+			</span><br>
 		
 		
 			<span class="article__tags">
-			  	<a class="article__tag-link" href="/tags/NachOS/" rel="tag">NachOS</a>
+			  	<a class="article__tag-link" href="/tags/python/">python</a>
 			</span>
 		
 	</div>
@@ -54,18 +54,34 @@
 	
 
 	
-		<h3 id="阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制"><a href="#阅读machine目录下的machine-h-cc-translate-h-cc-和userprog目录下的exception-h-cc-理解当前的所采用的TLB机制和地址转换机制" class="headerlink" title="阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制"></a>阅读machine目录下的machine.h(cc),translate.h(cc)和userprog目录下的exception.h(cc)理解当前的所采用的TLB机制和地址转换机制</h3><h4 id="translate-h-cc"><a href="#translate-h-cc" class="headerlink" title="translate.h(cc)"></a>translate.h(cc)</h4><ul>
-<li>定义了TranslationEntry类，包括virtualPage,physicalPage以及一些标志位:valid,redonly等。</li>
-<li>标识了用户空间的第i个虚拟页应该映射到主存的第j个物理页，且当前这个物理页所处的状态。</li>
-<li><p>Translate()函数接收虚拟地址，物理地址，页尺寸，是否写入为参数。将虚拟地址转换为实际地址。</p>
-<h4 id="machine-h-cc"><a href="#machine-h-cc" class="headerlink" title="machine.h(cc)"></a>machine.h(cc)</h4></li>
-<li><p>定义了页尺寸,物理内存中的帧数,内存中容量,TLB的大小。</p>
-</li>
-<li>定义Machine类,用于模拟主机的硬件。</li>
-<li>Machine类中包含了一些重要的函数Run(),ReadRegister(),WriteRegister()</li>
-<li>遍历TLB数组，查找是否有对应的映射。</li>
-<li>如果有，TLB命中，直接进行物理地址转换；否则TLB miss,进入Exception处理。</li>
+		<ol>
+<li><p>字符编码类型</p>
+<ul>
+<li>python2默认使用ascii字符编码,但因为ascii只支持数百个字符,不能灵活地满足非英文字符,所以p2也同时支持unicode。但是这样也多了一些标识和转换的麻烦。</li>
+<li>python3统一使用unicode字符,节省了开发者时间。</li>
 </ul>
+</li>
+</ol>
+<h4 id="兼容技巧"><a href="#兼容技巧" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>字符串赋值之前均使用前缀u</li>
+<li>引入unicode_literals</li>
+</ol>
+<hr>
+<ol start="2">
+<li><p>导入模块的路径搜索方式</p>
+<ul>
+<li>python2导入模块时首先会搜索到当前目录(cwd),若没有,则搜索环境变量路径.这一特性会给开发者带来许多困扰,尤其是自定义模块与系统模块重名的时侯。</li>
+<li>python3仅会搜索环境变量路径,当你需要搜索自定义模块时,你可以在包管理模式下将项目路径加入到环境变量中,然后再使用绝对路径和相对路径的方式导入。</li>
+</ul>
+</li>
+</ol>
+<h4 id="兼容技巧-1"><a href="#兼容技巧-1" class="headerlink" title="兼容技巧"></a>兼容技巧</h4><ol>
+<li>统一使用绝对路径进行自定义模块导入</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import sys</span><br><span class="line"></span><br><span class="line">path&#x3D;os.path.abspath()</span><br><span class="line">sys.path.append(path)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>如果是使用python2，则可以直接将要导入的文件夹（包）放到当前目录下。</li>
+</ol>
 
 	
 
@@ -87,7 +103,7 @@
 	<div class="footer-content">
 		
 	      <div class="footer__element">
-	<p>Hi there, <br />welcome to my Blog glad you found it. Have a look around, will you?</p>
+	<p>Hi there, <br>welcome to my Blog glad you found it. Have a look around, will you?</p>
 </div>
 
 	    
@@ -105,7 +121,7 @@
 	    
 
 		<div class="footer-credit">
-			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo" target="_blank" rel="noopener">MeiliDu</a></span>
+			<span>© 2020 Lexie oh | Powered by <a href="https://hexo.io/">Hexo</a> | Theme <a href="https://github.com/HoverBaum/meilidu-hexo">MeiliDu</a></span>
 		</div>
 
 	</div>
